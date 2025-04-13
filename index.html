@@ -1,0 +1,1963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <title>Ingredient Safety Checker</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>:root {
+    /* Light mode colors */
+    --primary: #4CAF50;
+    --primary-dark: #388E3C;
+    --text-dark: #212121;
+    --text-medium: #424242;
+    --text-light: #757575;
+    --border-color: #E0E0E0;
+    --background: #FAFAFA;
+    --white: #FFFFFF;
+    --red: #F44336;
+    --orange: #FF9800;
+    --green: #8BC34A;
+    --warning-bg: #FFF3E0;
+    
+    /* Dark mode colors */
+    --dm-background: #121212;
+    --dm-surface: #1E1E1E;
+    --dm-text: #E0E0E0;
+    --dm-border: #333333;
+    --dm-text-light: #B0B0B0;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
+}
+
+body {
+    background-color: var(--background);
+    color: var(--text-dark);
+    font-size: 14px;
+    line-height: 1.5;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Dark mode styles */
+body.dark-mode {
+    background-color: var(--dm-background);
+    color: var(--dm-text);
+}
+
+.page {
+    display: none;
+    max-width: 414px;
+    margin: 0 auto;
+    background: var(--white);
+    min-height: 100vh;
+    position: relative;
+    box-shadow: 0 0 14px rgba(0,0,0,0.05);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+body.dark-mode .page {
+    background-color: var(--dm-surface);
+    box-shadow: 0 0 14px rgba(0,0,0,0.3);
+}
+
+.page.active {
+    display: block;
+}
+
+.header {
+    padding: 16px;
+    border-bottom: 1px solid var(--border-color);
+    text-align: center;
+    position: relative;
+    transition: border-color 0.3s ease;
+}
+
+body.dark-mode .header {
+    border-bottom-color: var(--dm-border);
+}
+
+.header h1 {
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--text-dark);
+    transition: color 0.3s ease;
+}
+
+body.dark-mode .header h1 {
+    color: var(--dm-text);
+}
+
+.tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+    transition: border-color 0.3s ease;
+}
+
+body.dark-mode .tabs {
+    border-bottom-color: var(--dm-border);
+}
+
+.tab {
+    flex: 1;
+    padding: 16px;
+    text-align: center;
+    font-weight: 500;
+    color: var(--text-light);
+    position: relative;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+body.dark-mode .tab {
+    color: var(--dm-text-light);
+}
+
+.tab.active {
+    color: var(--primary);
+}
+
+.tab.active:after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--primary);
+}
+
+.content-section {
+    padding: 20px 16px;
+}
+
+.input-field {
+    margin-bottom: 24px;
+}
+
+.input-field label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--text-medium);
+    transition: color 0.3s ease;
+}
+
+body.dark-mode .input-field label {
+    color: var(--dm-text);
+}
+
+.input-field input,
+.input-field textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: var(--white);
+    color: var(--text-dark);
+    transition: all 0.3s ease;
+}
+
+body.dark-mode .input-field input,
+body.dark-mode .input-field textarea {
+    background-color: var(--dm-surface);
+    border-color: var(--dm-border);
+    color: var(--dm-text);
+}
+
+.input-field textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.divider {
+    text-align: center;
+    margin: 24px 0;
+    position: relative;
+}
+
+.divider:before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--border-color);
+    z-index: 1;
+    transition: background-color 0.3s ease;
+}
+
+body.dark-mode .divider:before {
+    background-color: var(--dm-border);
+}
+
+.divider span {
+    position: relative;
+    z-index: 2;
+    background: var(--white);
+    padding: 0 16px;
+    color: var(--text-light);
+    transition: all 0.3s ease;
+}
+
+body.dark-mode .divider span {
+    background-color: var(--dm-surface);
+    color: var(--dm-text-light);
+}
+
+.scan-card {
+    background: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 24px;
+    transition: all 0.3s ease;
+}
+
+body.dark-mode .scan-card {
+    background-color: var(--dm-surface);
+    border-color: var(--dm-border);
+}
+
+.scan-title {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 12px;
+    color: var(--text-dark);
+    transition: color 0.3s ease;
+}
+
+body.dark-mode .scan-title {
+    color: var(--dm-text);
+}
+
+.instructions {
+    margin-bottom: 20px;
+}
+
+.instructions ol {
+    padding-left: 20px;
+}
+
+.instructions li {
+    margin-bottom: 8px;
+    color: var(--text-medium);
+    transition: color 0.3s ease;
+}
+
+body.dark-mode .instructions li {
+    color: var(--dm-text-light);
+}
+
+.btn {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    border-radius: 4px;
+    font-weight: 500;
+    text-align: center;
+    margin-bottom: 12px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark);
+}
+
+.btn-secondary {
+    background: var(--white);
+    border: 1px solid var(--border-color);
+    color: var(--text-dark);
+    transition: all 0.3s ease;
+}
+
+body.dark-mode .btn-secondary {
+    background-color: var(--dm-surface);
+    border-color: var(--dm-border);
+    color: var(--dm-text);
+}
+
+.btn-secondary:hover {
+    background: #F5F5F5;
+}
+
+body.dark-mode .btn-secondary:hover {
+    background-color: #2a2a2a;
+}
+
+.btn-icon {
+    margin-right: 8px;
+}
+
+.btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.scan-content {
+    padding: 20px;
+}
+
+.scan-description {
+    text-align: center;
+    margin-bottom: 24px;
+    color: var(--text-medium);
+    transition: color 0.3s ease;
+}
+
+body.dark-mode .scan-description {
+    color: var(--dm-text-light);
+}
+
+.scan-actions {
+    margin-top: 32px;
+}
+
+.file-input {
+    display: none;
+}
+
+.results-content {
+    padding: 16px;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.results-header {
+    margin-bottom: 20px;
+}
+
+.results-header h2 {
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 4px;
+    color: var(--text-dark);
+    transition: color 0.3s ease;
+}
+
+body.dark-mode .results-header h2 {
+    color: var(--dm-text);
+}
+
+.results-header p {
+    color: var(--text-medium);
+    font-size: 14px;
+    transition: color 0.3s ease;
+}
+
+body.dark-mode .results-header p {
+    color: var(--dm-text-light);
+}
+
+.risk-assessment {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.risk-assessment h3 {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: var(--text-dark);
+    transition: color 0.3s ease;
+}
+
+body.dark-mode .risk-assessment h3 {
+    color: var(--dm-text);
+}
+
+.risk-display {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.risk-badge {
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.risk-badge.low {
+    background-color: #E8F5E9;
+    color: #2E7D32;
+}
+
+.risk-badge.medium {
+    background-color: #FFF3E0;
+    color: #EF6C00;
+}
+
+.risk-badge.high {
+    background-color: #FFEBEE;
+    color: #C62828;
+}
+
+.risk-meter {
+    height: 24px;
+    background: #EEEEEE;
+    border-radius: 12px;
+    margin: 20px 0;
+    position: relative;
+    overflow: hidden;
+    transition: background-color 0.3s ease;
+}
+
+body.dark-mode .risk-meter {
+    background-color: #2a2a2a;
+}
+
+.risk-level {
+    position: absolute;
+    height: 100%;
+}
+
+.risk-level.low {
+    background: var(--green);
+    width: 33%;
+    left: 0;
+}
+
+.risk-level.medium {
+    background: var(--orange);
+    width: 34%;
+    left: 33%;
+}
+
+.risk-level.high {
+    background: var(--red);
+    width: 33%;
+    right: 0;
+}
+
+.risk-indicator {
+    position: absolute;
+    top: -4px;
+    width: 4px;
+    height: 32px;
+    background: black;
+    transform: translateX(-50%);
+    z-index: 2;
+}
+
+.ingredient-item {
+    margin-bottom: 20px;
+    padding: 16px;
+    border-radius: 8px;
+    background: var(--white);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    position: relative;
+    border-left: 4px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+body.dark-mode .ingredient-item {
+    background-color: var(--dm-surface);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    border-left-color: var(--dm-border);
+}
+
+.ingredient-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.ingredient-icon {
+    font-size: 18px;
+    width: 24px;
+    text-align: center;
+}
+
+.ingredient-icon.low {
+    color: var(--green);
+}
+
+.ingredient-icon.medium {
+    color: var(--orange);
+}
+
+.ingredient-icon.high {
+    color: var(--red);
+}
+
+.ingredient-name {
+    font-weight: 500;
+    font-size: 16px;
+    flex-grow: 1;
+    color: var(--text-dark);
+    transition: color 0.3s ease;
+}
+
+body.dark-mode .ingredient-name {
+    color: var(--dm-text);
+}
+
+.ingredient-risk {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.ingredient-risk.low {
+    background: #E8F5E9;
+    color: #2E7D32;
+}
+
+.ingredient-risk.medium {
+    background: #FFF3E0;
+    color: #EF6C00;
+}
+
+.ingredient-risk.high {
+    background: #FFEBEE;
+    color: #C62828;
+}
+
+.ingredient-desc {
+    color: var(--text-medium);
+    font-size: 14px;
+    line-height: 1.5;
+    margin-top: 8px;
+    transition: color 0.3s ease;
+}
+
+body.dark-mode .ingredient-desc {
+    color: var(--dm-text-light);
+}
+
+.ingredient-reference {
+    font-size: 12px;
+    color: var(--text-light);
+    margin-top: 8px;
+    font-style: italic;
+}
+
+body.dark-mode .ingredient-reference {
+    color: var(--dm-text-light);
+}
+
+.risk-warning {
+    background: var(--warning-bg);
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #D84315;
+}
+
+body.dark-mode .risk-warning {
+    background-color: #33261a;
+    color: #FFAB91;
+}
+
+.history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+body.dark-mode .history-item {
+    border-bottom-color: var(--dm-border);
+}
+
+.history-item:hover {
+    background: #f5f5f5;
+}
+
+body.dark-mode .history-item:hover {
+    background-color: #2a2a2a;
+}
+
+.history-item-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.history-product {
+    font-weight: 500;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--text-dark);
+    transition: color 0.3s ease;
+}
+
+body.dark-mode .history-product {
+    color: var(--dm-text);
+}
+
+.history-date {
+    font-size: 12px;
+    color: var(--text-light);
+    transition: color 0.3s ease;
+}
+
+body.dark-mode .history-date {
+    color: var(--dm-text-light);
+}
+
+.history-item-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.history-risk {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.history-risk.low {
+    background: #E8F5E9;
+    color: var(--primary-dark);
+}
+
+.history-risk.medium {
+    background: #FFF3E0;
+    color: #EF6C00;
+}
+
+.history-risk.high {
+    background: #FFEBEE;
+    color: var(--red);
+}
+
+.delete-history-btn {
+    background: none;
+    border: none;
+    color: var(--text-light);
+    cursor: pointer;
+    padding: 5px;
+    font-size: 14px;
+    transition: color 0.2s;
+}
+
+body.dark-mode .delete-history-btn {
+    color: var(--dm-text-light);
+}
+
+.delete-history-btn:hover {
+    color: var(--red);
+}
+
+.history-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-light);
+}
+
+body.dark-mode .history-empty {
+    color: var(--dm-text-light);
+}
+
+.history-empty i {
+    font-size: 40px;
+    margin-bottom: 15px;
+    color: var(--border-color);
+}
+
+body.dark-mode .history-empty i {
+    color: var(--dm-border);
+}
+
+.learn-content {
+    padding: 20px;
+}
+
+.learn-card {
+    background: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+    transition: all 0.3s ease;
+}
+
+body.dark-mode .learn-card {
+    background-color: var(--dm-surface);
+    border-color: var(--dm-border);
+}
+
+.learn-card h3 {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 16px;
+    color: var(--text-dark);
+    transition: color 0.3s ease;
+}
+
+body.dark-mode .learn-card h3 {
+    color: var(--dm-text);
+}
+
+.learn-card h3 i {
+    margin-right: 8px;
+    color: var(--primary);
+}
+
+.learn-card p {
+    color: var(--text-medium);
+    margin-bottom: 12px;
+    font-size: 14px;
+    transition: color 0.3s ease;
+}
+
+body.dark-mode .learn-card p {
+    color: var(--dm-text-light);
+}
+
+.learn-more {
+    background: none;
+    border: none;
+    color: var(--primary);
+    font-weight: 500;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.learn-more::after {
+    content: "→";
+    margin-left: 4px;
+}
+
+.back-btn {
+    position: absolute;
+    left: 16px;
+    top: 16px;
+    background: none;
+    border: none;
+    color: var(--primary);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background: var(--white);
+    padding: 25px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+body.dark-mode .modal-content {
+    background-color: var(--dm-surface);
+}
+
+.close-modal {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-medium);
+    transition: color 0.3s ease;
+}
+
+body.dark-mode .close-modal {
+    color: var(--dm-text-light);
+}
+
+#modalMediaContainer {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+#modalMediaContainer img,
+#modalMediaContainer video {
+    width: 100%;
+    border-radius: 8px;
+    max-height: 60vh;
+    object-fit: contain;
+}
+
+.ocr-progress {
+    text-align: center;
+    margin: 15px 0;
+    color: var(--primary);
+    font-weight: 500;
+}
+
+.loader {
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    border-top: 4px solid var(--primary);
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+    display: none;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+#analyzeBtn.loading {
+    position: relative;
+    color: transparent;
+    pointer-events: none;
+}
+
+#analyzeBtn.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s linear infinite;
+}
+
+#cameraPreview {
+    width: 100%;
+    max-height: 300px;
+    object-fit: contain;
+    background: #000;
+    display: none;
+    margin-bottom: 15px;
+    border-radius: 8px;
+}
+
+.camera-controls {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+/* Dark mode toggle button */
+.dark-mode-toggle {
+    position: absolute;
+    right: 16px;
+    top: 16px;
+    background: none;
+    border: none;
+    color: var(--text-dark);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.dark-mode-toggle:hover {
+    transform: scale(1.1);
+}
+
+body.dark-mode .dark-mode-toggle {
+    color: #FFD700;
+}
+
+@media screen and (orientation: landscape) {
+    .scan-content {
+        padding-top: 10px;
+    }
+    #cameraPreview {
+        max-height: 200px;
+    }
+}</style>
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <title>Ingredient Safety Checker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Analyze Page -->
+    <div id="analyzePage" class="page active">
+        <div class="header">
+            <h1>Ingredient Analyzer</h1>
+            <button class="dark-mode-toggle">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="analyze">Analyze</div>
+            <div class="tab" data-tab="history">History</div>
+            <div class="tab" data-tab="learn">Learn</div>
+        </div>
+
+        <div class="content-section">
+            <div class="input-field">
+                <label>Product Name (Optional)</label>
+                <input type="text" id="productName" placeholder="e.g., 'Maggie Noodles'">
+            </div>
+
+            <div class="input-field">
+                <label>Ingredients List</label>
+                <textarea id="ingredientsList" placeholder="Enter ingredients separated by commas or new lines"></textarea>
+            </div>
+
+            <button id="analyzeBtn" class="btn btn-primary">
+                <i class="fas fa-search btn-icon"></i>Analyze Ingredients
+            </button>
+
+            <div class="divider">
+                <span>OR</span>
+            </div>
+
+            <div class="scan-card">
+                <h3 class="scan-title">Scan Ingredients Label</h3>
+                <div class="instructions">
+                    <ol>
+                        <li>Take a clear photo of the ingredients list</li>
+                        <li>Ensure text is visible and well-lit</li>
+                        <li>We'll extract ingredients automatically</li>
+                    </ol>
+                </div>
+                <button id="scanBtn" class="btn btn-secondary">
+                    <i class="fas fa-camera btn-icon"></i>Scan Now
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scan Page -->
+    <div id="scanPage" class="page">
+        <div class="header">
+            <button id="backBtn" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h1>Scan Ingredients</h1>
+            <button class="dark-mode-toggle">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+
+        <div class="scan-content">
+            <p class="scan-description">Upload an image of ingredients list</p>
+
+            <div class="scan-instructions">
+                <h3>Instructions</h3>
+                <ol>
+                    <li>Hold camera parallel to ingredients list</li>
+                    <li>Make sure text is clear and not blurry</li>
+                    <li>Avoid glare and shadows</li>
+                    <li>The app will extract and parse ingredients</li>
+                </ol>
+            </div>
+
+            <video id="cameraPreview" autoplay playsinline></video>
+            
+            <div class="scan-actions">
+                <label for="fileUpload" class="btn btn-secondary">
+                    <i class="fas fa-upload btn-icon"></i>Upload Image
+                </label>
+                <input type="file" id="fileUpload" accept="image/*" class="file-input">
+                
+                <button id="cameraBtn" class="btn btn-secondary">
+                    <i class="fas fa-camera btn-icon"></i>Take Photo
+                </button>
+                
+                <button id="captureBtn" class="btn btn-primary" style="display: none;">
+                    <i class="fas fa-camera btn-icon"></i>Capture
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Page -->
+    <div id="resultsPage" class="page">
+        <div class="header">
+            <button id="backToAnalyze" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h1>Analysis Results</h1>
+            <button class="dark-mode-toggle">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+
+        <div class="results-content">
+            <div class="results-header">
+                <h2 id="resultsProductName">Scanned Product</h2>
+                <p id="ingredientsCount">0 ingredients analyzed</p>
+            </div>
+
+            <div class="risk-assessment">
+                <h3>Overall Risk Assessment</h3>
+                <div class="risk-display">
+                    <span id="riskLevel" class="risk-badge low">
+                        <i class="fas fa-leaf"></i> Low Risk
+                    </span>
+                    <span id="riskScore">Score: 0.0/3.0</span>
+                </div>
+            </div>
+
+            <div class="risk-meter">
+                <div class="risk-level low"></div>
+                <div class="risk-level medium"></div>
+                <div class="risk-level high"></div>
+                <div class="risk-indicator" id="riskIndicator" style="left: 0%"></div>
+            </div>
+
+            <div id="ingredientsAnalysis">
+                <!-- Ingredients will be added here dynamically -->
+            </div>
+
+            <button id="saveAnalysisBtn" class="btn btn-primary">
+                <i class="fas fa-save btn-icon"></i>Save Analysis
+            </button>
+        </div>
+    </div>
+
+    <!-- History Page -->
+    <div id="historyPage" class="page">
+        <div class="header">
+            <button id="backToAnalyzeFromHistory" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h1>History</h1>
+            <button class="dark-mode-toggle">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+
+        <div id="historyList">
+            <!-- History items will be added here dynamically -->
+        </div>
+    </div>
+
+    <!-- Learn Page -->
+    <div id="learnPage" class="page">
+        <div class="header">
+            <button id="backToAnalyzeFromLearn" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h1>Learn</h1>
+            <button class="dark-mode-toggle">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+
+        <div class="learn-content">
+            <div class="learn-card">
+                <h3><i class="fas fa-prescription-bottle-alt"></i> Food Additives</h3>
+                <p>Learn about common additives and their potential health effects</p>
+                <button class="learn-more">Explore →</button>
+            </div>
+
+            <div class="learn-card">
+                <h3><i class="fas fa-allergies"></i> Common Allergens</h3>
+                <p>Identify ingredients that commonly cause allergic reactions</p>
+                <button class="learn-more">Explore →</button>
+            </div>
+
+            <div class="learn-card">
+                <h3><i class="fas fa-shield-alt"></i> Preservatives</h3>
+                <p>Understand different types of preservatives used in products</p>
+                <button class="learn-more">Explore →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Preview Modal -->
+    <div id="imageModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div id="modalMediaContainer"></div>
+            <div class="ocr-progress">Ready to process</div>
+            <button id="processImageBtn" class="btn btn-primary">
+                <i class="fas fa-magic btn-icon"></i>Extract Ingredients
+            </button>
+        </div>
+    </div>
+
+    <!-- History Item Template -->
+    <template id="historyItemTemplate">
+        <div class="history-item">
+            <div class="history-item-content">
+                <div class="history-product"></div>
+                <div class="history-date"></div>
+            </div>
+            <div class="history-item-actions">
+                <span class="history-risk"></span>
+                <button class="delete-history-btn">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    </template>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.1.1/tesseract.min.js"></script>
+    <script src="script.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.1.1/tesseract.min.js"></script>
+<script>// Ingredient Safety Checker - Complete JavaScript
+document.addEventListener('DOMContentLoaded', function() {
+    // DOM Elements
+    const pages = {
+        analyze: document.getElementById('analyzePage'),
+        scan: document.getElementById('scanPage'),
+        results: document.getElementById('resultsPage'),
+        history: document.getElementById('historyPage'),
+        learn: document.getElementById('learnPage')
+    };
+
+    const tabs = document.querySelectorAll('.tab');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const scanBtn = document.getElementById('scanBtn');
+    const backBtns = document.querySelectorAll('.back-btn');
+    const saveAnalysisBtn = document.getElementById('saveAnalysisBtn');
+    const fileUpload = document.getElementById('fileUpload');
+    const productNameInput = document.getElementById('productName');
+    const ingredientsListInput = document.getElementById('ingredientsList');
+    const resultsProductName = document.getElementById('resultsProductName');
+    const ingredientsCount = document.getElementById('ingredientsCount');
+    const riskLevel = document.getElementById('riskLevel');
+    const riskScore = document.getElementById('riskScore');
+    const riskIndicator = document.getElementById('riskIndicator');
+    const ingredientsAnalysis = document.getElementById('ingredientsAnalysis');
+    const historyList = document.getElementById('historyList');
+    const imageModal = document.getElementById('imageModal');
+    const modalMediaContainer = document.getElementById('modalMediaContainer');
+    const closeModal = document.querySelector('.close-modal');
+    const cameraBtn = document.getElementById('cameraBtn');
+    const captureBtn = document.getElementById('captureBtn');
+    const cameraPreview = document.getElementById('cameraPreview');
+    const processImageBtn = document.getElementById('processImageBtn');
+    const ocrProgress = document.querySelector('.ocr-progress');
+    const darkModeToggles = document.querySelectorAll('.dark-mode-toggle');
+
+    // Camera stream and OCR worker
+    let cameraStream = null;
+    let worker = null;
+
+    // Complete Ingredient Database
+    const ingredientDatabase = {
+        // Basic Ingredients
+        "Potato": {
+            risk: "low",
+            desc: "Natural vegetable, generally safe and nutritious.",
+            icon: "fas fa-seedling",
+            category: "vegetables"
+        },
+        "Edible Vegetable Oil": {
+            risk: "low",
+            desc: "Plant-based oils, nutritional value depends on specific type.",
+            icon: "fas fa-oil-can",
+            category: "fats"
+        },
+        "Salt": {
+            risk: "medium",
+            desc: "Excessive sodium intake may lead to high blood pressure.",
+            icon: "fas fa-mortar-pestle",
+            category: "minerals",
+            reference: "WHO Sodium Guidelines"
+        },
+        "Sugar": {
+            risk: "medium",
+            desc: "Excessive consumption linked to weight gain and diabetes.",
+            icon: "fas fa-cube",
+            category: "sweeteners",
+            reference: "WHO Sugar Guidelines"
+        },
+        "Wheat Flour": {
+            risk: "medium",
+            desc: "High glycemic index causing blood sugar spikes.",
+            icon: "fas fa-bread-slice",
+            category: "grains"
+        },
+        "Palm Oil": {
+            risk: "medium",
+            desc: "High in saturated fats linked to heart disease.",
+            icon: "fas fa-oil-can",
+            category: "fats",
+            reference: "WHO Guidelines"
+        },
+
+        // Additives and E-numbers
+        "Potassium Chloride (508)": {
+            risk: "medium",
+            desc: "Gelling agent. May cause hyperkalemia in sensitive individuals.",
+            icon: "fas fa-heartbeat",
+            category: "thickeners",
+            reference: "FDA GRAS Notice"
+        },
+        "Guar Gum (412)": {
+            risk: "low",
+            desc: "Natural thickener. May cause digestive issues.",
+            icon: "fas fa-seedling",
+            category: "thickeners"
+        },
+        "Citric Acid (330)": {
+            risk: "low",
+            desc: "Common preservative. May erode tooth enamel.",
+            icon: "fas fa-lemon",
+            category: "preservatives"
+        },
+        "TBHQ": {
+            risk: "high",
+            desc: "Preservative with potential cancer risk at high doses.",
+            icon: "fas fa-radiation-alt",
+            category: "preservatives",
+            reference: "IARC Monographs"
+        },
+        "Disodium 5'-Ribonucleotides (635)": {
+            risk: "medium",
+            desc: "Flavor enhancer similar to MSG.",
+            icon: "fas fa-head-side-virus",
+            category: "flavor enhancers"
+        },
+        "Sodium Benzoate": {
+            risk: "high",
+            desc: "Preservative that may form carcinogenic benzene with vitamin C.",
+            icon: "fas fa-prescription-bottle-alt",
+            category: "preservatives",
+            reference: "FDA Report"
+        },
+        "Monosodium Glutamate (MSG)": {
+            risk: "medium",
+            desc: "Flavor enhancer that may cause headaches in sensitive individuals.",
+            icon: "fas fa-head-side-virus",
+            category: "flavor enhancers"
+        },
+        "High Fructose Corn Syrup": {
+            risk: "high",
+            desc: "Linked to obesity, diabetes and fatty liver disease.",
+            icon: "fas fa-weight",
+            category: "sweeteners",
+            reference: "AJCN Study"
+        },
+        "Sodium Nitrite": {
+            risk: "high",
+            desc: "Preservative that may form carcinogenic nitrosamines.",
+            icon: "fas fa-drumstick-bite",
+            category: "preservatives",
+            reference: "WHO IARC"
+        },
+        "Caramel Color (150d)": {
+            risk: "medium",
+            desc: "May contain 4-MEI which has potential carcinogenic effects.",
+            icon: "fas fa-palette",
+            category: "colorings",
+            reference: "IARC Evaluation"
+        },
+        "Acesulfame K": {
+            risk: "medium",
+            desc: "Artificial sweetener with debated cancer links.",
+            icon: "fas fa-exclamation-triangle",
+            category: "artificial sweeteners"
+        },
+        "Sucralose (E955)": {
+            risk: "medium",
+            desc: "Artificial sweetener that may affect gut health.",
+            icon: "fas fa-pills",
+            category: "artificial sweeteners"
+        },
+        "Potassium Sorbate": {
+            risk: "low",
+            desc: "Preservative that may cause allergic reactions.",
+            icon: "fas fa-prescription-bottle-alt",
+            category: "preservatives"
+        },
+        "Sodium Metabisulfite (223)": {
+            risk: "high",
+            desc: "Can trigger asthma and allergic reactions.",
+            icon: "fas fa-lungs",
+            category: "preservatives",
+            reference: "FDA Allergen Notice"
+        },
+        "Sodium Sulphite (220)": {
+            risk: "high",
+            desc: "Preservative that can cause respiratory issues.",
+            icon: "fas fa-lungs",
+            category: "preservatives"
+        },
+        "Calcium Disodium EDTA (E385)": {
+            risk: "medium",
+            desc: "Preservative problematic for those with kidney issues.",
+            icon: "fas fa-kidneys",
+            category: "preservatives"
+        },
+
+        // Energy Drink Components
+        "Taurine": {
+            risk: "medium",
+            desc: "May affect cardiovascular system with caffeine.",
+            icon: "fas fa-heartbeat",
+            category: "supplements",
+            reference: "EFSA Assessment"
+        },
+        "Caffeine": {
+            risk: "medium",
+            desc: "May cause anxiety, insomnia in high doses.",
+            icon: "fas fa-coffee",
+            category: "stimulants"
+        },
+        "Inositol": {
+            risk: "low",
+            desc: "May cause digestive issues at high doses.",
+            icon: "fas fa-exclamation-circle",
+            category: "supplements"
+        },
+        "Beta Carotene": {
+            risk: "low",
+            desc: "Natural coloring and vitamin A source.",
+            icon: "fas fa-palette",
+            category: "colorings"
+        }
+    };
+
+    // Initialize the app
+    function init() {
+        setupEventListeners();
+        loadHistory();
+        initDarkMode();
+        
+        if (!localStorage.getItem('analysisHistory')) {
+            const sampleHistory = [
+                {
+                    id: 1,
+                    productName: "Sample Instant Noodles",
+                    ingredientCount: "8",
+                    score: "2.1/3.0",
+                    level: "high",
+                    date: new Date().toLocaleDateString(),
+                    ingredients: ["Wheat Flour", "Palm Oil", "Salt", "MSG", "TBHQ", "Artificial Colors", "Sodium Triphosphate", "Sugar"]
+                },
+                {
+                    id: 2,
+                    productName: "Energy Drink Sample",
+                    ingredientCount: "5",
+                    score: "1.8/3.0",
+                    level: "medium",
+                    date: new Date().toLocaleDateString(),
+                    ingredients: ["Taurine", "Caffeine", "Sucralose", "Acesulfame K", "Citric Acid"]
+                }
+            ];
+            localStorage.setItem('analysisHistory', JSON.stringify(sampleHistory));
+        }
+    }
+
+    // Dark mode functions
+    function initDarkMode() {
+        const darkMode = localStorage.getItem('darkMode') === 'true';
+        if (darkMode) {
+            document.body.classList.add('dark-mode');
+            updateDarkModeIcons(true);
+        }
+    }
+
+    function toggleDarkMode() {
+        const isDark = document.body.classList.toggle('dark-mode');
+        localStorage.setItem('darkMode', isDark);
+        updateDarkModeIcons(isDark);
+    }
+
+    function updateDarkModeIcons(isDark) {
+        const icon = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        darkModeToggles.forEach(toggle => {
+            toggle.innerHTML = icon;
+        });
+    }
+
+    // Event listeners
+    function setupEventListeners() {
+        // Tab navigation
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.dataset.tab;
+                switchTab(tabName);
+            });
+        });
+
+        // Analyze button
+        analyzeBtn.addEventListener('click', analyzeIngredients);
+
+        // Scan button
+        scanBtn.addEventListener('click', () => {
+            showPage('scan');
+            stopCamera();
+        });
+
+        // Back buttons
+        backBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                showPage('analyze');
+                stopCamera();
+            });
+        });
+
+        // File upload
+        fileUpload.addEventListener('change', handleFileUpload);
+
+        // Save analysis
+        saveAnalysisBtn.addEventListener('click', saveAnalysis);
+
+        // Modal close
+        closeModal.addEventListener('click', closeImageModal);
+        
+        window.addEventListener('click', (e) => {
+            if (e.target === imageModal) closeImageModal();
+        });
+
+        // Camera buttons
+        cameraBtn.addEventListener('click', startCamera);
+        captureBtn.addEventListener('click', captureImage);
+
+        // Process image button
+        processImageBtn.addEventListener('click', processImageWithOCR);
+
+        // Dark mode toggles
+        darkModeToggles.forEach(toggle => {
+            toggle.addEventListener('click', toggleDarkMode);
+        });
+    }
+
+    // Navigation functions
+    function switchTab(tabName) {
+        tabs.forEach(tab => {
+            tab.classList.toggle('active', tab.dataset.tab === tabName);
+        });
+        showPage(tabName);
+        if (tabName === 'history') loadHistory();
+    }
+
+    function showPage(pageName) {
+        Object.values(pages).forEach(page => page.classList.remove('active'));
+        if (pages[pageName]) pages[pageName].classList.add('active');
+        window.scrollTo(0, 0);
+    }
+
+    // Analysis functions
+    function analyzeIngredients() {
+        const productName = productNameInput.value.trim() || "Unnamed Product";
+        const ingredients = ingredientsListInput.value
+            .split(/[\n,]/)
+            .map(i => i.trim())
+            .filter(i => i);
+
+        if (ingredients.length === 0) {
+            alert("Please enter at least one ingredient");
+            return;
+        }
+
+        showResults(productName, ingredients);
+    }
+
+    function showResults(productName, ingredients) {
+        resultsProductName.textContent = productName;
+        ingredientsCount.textContent = `${ingredients.length} ingredients analyzed`;
+        
+        let baseScore = 0;
+        let compoundRiskFactors = 1;
+        const riskCategories = {
+            preservatives: 0,
+            artificial: 0,
+            allergens: 0,
+            additives: 0
+        };
+        
+        ingredientsAnalysis.innerHTML = '';
+
+        ingredients.forEach(ingredient => {
+            const found = Object.entries(ingredientDatabase).find(([name]) => 
+                ingredient.toLowerCase().includes(name.toLowerCase()) ||
+                name.toLowerCase().includes(ingredient.toLowerCase()) ||
+                levenshteinDistance(ingredient.toLowerCase(), name.toLowerCase()) <= 2
+            );
+            
+            const data = found ? ingredientDatabase[found[0]] : { 
+                risk: "medium", 
+                desc: "No specific safety data available.",
+                icon: "fas fa-question",
+                category: "unknown"
+            };
+
+            // Advanced scoring
+            let ingredientScore = 0;
+            switch(data.risk) {
+                case "high": 
+                    ingredientScore = 0.5;
+                    compoundRiskFactors *= 1.3;
+                    break;
+                case "medium": 
+                    ingredientScore = 0.2; 
+                    compoundRiskFactors *= 1.1;
+                    break;
+                case "low": 
+                    ingredientScore = 0.05;
+                    break;
+            }
+
+            // Category-specific scoring
+            if (data.category) {
+                riskCategories[data.category] += ingredientScore * 1.5;
+            }
+
+            baseScore += ingredientScore;
+
+            // Display ingredient
+            const ingredientEl = document.createElement('div');
+            ingredientEl.className = 'ingredient-item';
+            ingredientEl.style.borderLeftColor = getRiskColor(data.risk);
+            ingredientEl.innerHTML = `
+                <div class="ingredient-header">
+                    <i class="${data.icon} ingredient-icon ${data.risk}"></i>
+                    <div class="ingredient-name">${ingredient}</div>
+                    <div class="ingredient-risk ${data.risk}">${data.risk.toUpperCase()}</div>
+                </div>
+                <div class="ingredient-desc">${data.desc}</div>
+                ${data.reference ? `<div class="ingredient-reference">Source: ${data.reference}</div>` : ''}
+            `;
+            ingredientsAnalysis.appendChild(ingredientEl);
+        });
+
+        // Check for compound warnings
+        const compoundWarnings = checkCompoundRisks(ingredients);
+        if (compoundWarnings.length > 0) {
+            compoundWarnings.forEach(warning => {
+                const warningEl = document.createElement('div');
+                warningEl.className = `risk-warning ${warning.severity}`;
+                warningEl.innerHTML = `
+                    <i class="${warning.icon}"></i>
+                    <strong>${warning.severity === 'high' ? 'Warning' : 'Note'}:</strong> ${warning.message}
+                `;
+                ingredientsAnalysis.prepend(warningEl);
+            });
+        }
+
+        // Calculate final score
+        let finalScore = Math.min(baseScore * compoundRiskFactors, 3);
+        finalScore += Math.min(
+            (riskCategories.preservatives * 0.7) + 
+            (riskCategories.artificial * 0.9) + 
+            (riskCategories.allergens * 0.5),
+            1.5
+        );
+
+        // Determine risk level
+        let level = "low";
+        if (finalScore >= 2.0 || riskCategories.artificial > 1.2) {
+            level = "high";
+        } else if (finalScore >= 1.2 || riskCategories.preservatives > 0.8) {
+            level = "medium";
+        }
+
+        // Update UI
+        riskLevel.innerHTML = `<i class="${getLevelIcon(level)}"></i> ${level.charAt(0).toUpperCase() + level.slice(1)} Risk`;
+        riskLevel.className = `risk-badge ${level}`;
+        riskScore.textContent = `Score: ${finalScore.toFixed(1)}/3.0`;
+        riskIndicator.style.left = `${(finalScore / 3) * 100}%`;
+
+        saveAnalysisBtn.disabled = false;
+        saveAnalysisBtn.textContent = 'Save Analysis';
+        showPage('results');
+    }
+
+    // Check for dangerous ingredient combinations
+    function checkCompoundRisks(ingredients) {
+        const compoundWarnings = [];
+        const lowerCaseIngredients = ingredients.map(i => i.toLowerCase());
+
+        // Caffeine + Taurine
+        if (lowerCaseIngredients.some(i => i.includes('caffeine')) && 
+            lowerCaseIngredients.some(i => i.includes('taurine'))) {
+            compoundWarnings.push({
+                severity: "high",
+                message: "Caffeine and Taurine combination may cause cardiovascular stress",
+                icon: "fas fa-heartbeat"
+            });
+        }
+
+        // Multiple preservatives
+        const preservativeCount = lowerCaseIngredients.filter(i => 
+            ['tbhq', 'sodium benzoate', 'potassium sorbate', 'sodium metabisulfite'].some(p => i.includes(p))
+        ).length;
+        if (preservativeCount > 2) {
+            compoundWarnings.push({
+                severity: "high",
+                message: `Multiple preservatives (${preservativeCount}) may increase health risks`,
+                icon: "fas fa-prescription-bottle-alt"
+            });
+        }
+
+        // Multiple artificial sweeteners
+        const sweetenerCount = lowerCaseIngredients.filter(i => 
+            ['acesulfame k', 'sucralose', 'aspartame'].some(s => i.includes(s))
+        ).length;
+        if (sweetenerCount > 1) {
+            compoundWarnings.push({
+                severity: "medium",
+                message: "Multiple artificial sweeteners may affect gut health",
+                icon: "fas fa-poop"
+            });
+        }
+
+        // MSG combinations
+        if (lowerCaseIngredients.some(i => i.includes('monosodium glutamate') || i.includes('msg'))) {
+            if (lowerCaseIngredients.some(i => i.includes('disodium 5\'-ribonucleotides') || i.includes('635'))) {
+                compoundWarnings.push({
+                    severity: "high",
+                    message: "MSG with ribonucleotides may intensify flavor-enhancing effects and reactions",
+                    icon: "fas fa-head-side-virus"
+                });
+            }
+        }
+
+        return compoundWarnings;
+    }
+
+    // Utility functions
+    function getRiskColor(riskLevel) {
+        const colors = {
+            low: '#8BC34A',
+            medium: '#FF9800',
+            high: '#F44336'
+        };
+        return colors[riskLevel];
+    }
+
+    function getLevelIcon(level) {
+        const icons = {
+            low: 'fas fa-leaf',
+            medium: 'fas fa-exclamation-circle',
+            high: 'fas fa-radiation-alt'
+        };
+        return icons[level];
+    }
+
+    // Levenshtein distance for fuzzy matching
+    function levenshteinDistance(a, b) {
+        if (a.length === 0) return b.length;
+        if (b.length === 0) return a.length;
+
+        const matrix = [];
+        for (let i = 0; i <= b.length; i++) {
+            matrix[i] = [i];
+        }
+        for (let j = 0; j <= a.length; j++) {
+            matrix[0][j] = j;
+        }
+
+        for (let i = 1; i <= b.length; i++) {
+            for (let j = 1; j <= a.length; j++) {
+                const cost = a.charAt(j - 1) === b.charAt(i - 1) ? 0 : 1;
+                matrix[i][j] = Math.min(
+                    matrix[i - 1][j] + 1,
+                    matrix[i][j - 1] + 1,
+                    matrix[i - 1][j - 1] + cost
+                );
+            }
+        }
+
+        return matrix[b.length][a.length];
+    }
+
+    // History functions
+    function saveAnalysis() {
+        const history = JSON.parse(localStorage.getItem('analysisHistory') || '[]');
+        
+        const newAnalysis = {
+            id: Date.now(),
+            productName: resultsProductName.textContent,
+            ingredientCount: ingredientsCount.textContent.split(' ')[0],
+            score: riskScore.textContent.split(' ')[1],
+            level: riskLevel.className.replace('risk-badge ', ''),
+            date: new Date().toLocaleDateString(),
+            ingredients: Array.from(document.querySelectorAll('.ingredient-item .ingredient-name'))
+                .map(el => el.textContent)
+        };
+
+        history.unshift(newAnalysis);
+        localStorage.setItem('analysisHistory', JSON.stringify(history.slice(0, 50)));
+        alert('Analysis saved to history!');
+        loadHistory();
+    }
+
+    function loadHistory() {
+        const history = JSON.parse(localStorage.getItem('analysisHistory') || '[]');
+        historyList.innerHTML = '';
+
+        if (history.length === 0) {
+            historyList.innerHTML = `
+                <div class="history-empty">
+                    <i class="fas fa-history"></i>
+                    <p>No analysis history yet</p>
+                </div>
+            `;
+            return;
+        }
+
+        const template = document.getElementById('historyItemTemplate');
+
+        history.forEach(item => {
+            const clone = template.content.cloneNode(true);
+            const historyItem = clone.querySelector('.history-item');
+            const productElement = clone.querySelector('.history-product');
+            const dateElement = clone.querySelector('.history-date');
+            const riskElement = clone.querySelector('.history-risk');
+            const deleteBtn = clone.querySelector('.delete-history-btn');
+
+            productElement.textContent = item.productName;
+            dateElement.textContent = `${item.date} • ${item.ingredientCount} ingredients`;
+            riskElement.textContent = item.level.toUpperCase();
+            riskElement.className = `history-risk ${item.level}`;
+            
+            historyItem.addEventListener('click', (e) => {
+                if (!e.target.closest('.delete-history-btn')) {
+                    viewHistoricalAnalysis(item);
+                }
+            });
+
+            deleteBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                deleteAnalysis(item.id);
+            });
+
+            historyList.appendChild(clone);
+        });
+    }
+
+    function deleteAnalysis(id) {
+        if (confirm('Are you sure you want to delete this analysis?')) {
+            let history = JSON.parse(localStorage.getItem('analysisHistory') || '[]');
+            history = history.filter(item => item.id !== id);
+            localStorage.setItem('analysisHistory', JSON.stringify(history));
+            loadHistory();
+        }
+    }
+
+    function viewHistoricalAnalysis(item) {
+        showResults(item.productName, item.ingredients || []);
+        riskScore.textContent = `Score: ${item.score}`;
+        const scoreValue = parseFloat(item.score.split('/')[0]);
+        riskIndicator.style.left = `${(scoreValue / 3) * 100}%`;
+        saveAnalysisBtn.disabled = true;
+        saveAnalysisBtn.textContent = 'Previously Saved';
+    }
+
+    // Camera and OCR functions
+    function handleFileUpload(e) {
+        if (e.target.files.length > 0) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = (event) => {
+                modalMediaContainer.innerHTML = `
+                    <img src="${event.target.result}" alt="Uploaded Image">
+                `;
+                imageModal.classList.add('active');
+            };
+            
+            reader.readAsDataURL(file);
+        }
+    }
+
+    async function startCamera() {
+        try {
+            cameraStream = await navigator.mediaDevices.getUserMedia({ 
+                video: { facingMode: 'environment' },
+                audio: false 
+            });
+            cameraPreview.srcObject = cameraStream;
+            cameraPreview.style.display = 'block';
+            cameraBtn.style.display = 'none';
+            captureBtn.style.display = 'block';
+        } catch (err) {
+            console.error("Camera error:", err);
+            alert("Could not access the camera. Please check permissions.");
+        }
+    }
+
+    function stopCamera() {
+        if (cameraStream) {
+            cameraStream.getTracks().forEach(track => track.stop());
+            cameraStream = null;
+        }
+        cameraPreview.style.display = 'none';
+        cameraBtn.style.display = 'block';
+        captureBtn.style.display = 'none';
+    }
+
+    function captureImage() {
+        const canvas = document.createElement('canvas');
+        canvas.width = cameraPreview.videoWidth;
+        canvas.height = cameraPreview.videoHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(cameraPreview, 0, 0, canvas.width, canvas.height);
+        
+        modalMediaContainer.innerHTML = `
+            <img src="${canvas.toDataURL('image/jpeg')}" alt="Captured Image">
+        `;
+        
+        imageModal.classList.add('active');
+        stopCamera();
+    }
+
+    async function processImageWithOCR() {
+        const image = modalMediaContainer.querySelector('img');
+        if (!image) return;
+
+        ocrProgress.textContent = "Initializing OCR...";
+        processImageBtn.disabled = true;
+        
+        try {
+            if (!worker) {
+                worker = await Tesseract.createWorker({
+                    logger: m => {
+                        if (m.status === 'recognizing text') {
+                            ocrProgress.textContent = `Processing: ${Math.round(m.progress * 100)}%`;
+                        }
+                    }
+                });
+                await worker.loadLanguage('eng');
+                await worker.initialize('eng');
+                await worker.setParameters({
+                    tessedit_pageseg_mode: '6',
+                    preserve_interword_spaces: '1',
+                    tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789(),.-% ',
+                    user_defined_dpi: '300'
+                });
+            }
+
+            ocrProgress.textContent = "Processing image...";
+            
+            const { data: { text } } = await worker.recognize(image);
+            
+            // Advanced ingredient list parsing
+            let cleanedText = text
+                .replace(/(nutrition facts|serving size|daily value|ingredients?[:]?|contains?[:]?|may contain|product of|packaged? in|distributed? by|manufactured? for)/gi, '')
+                .replace(/(\d+%|\d+\.\d+%|\d+\s?g|\d+\s?mg|\d+\s?mcg|\d+\s?oz|\d+\s?ml|\d+\s?kcal|\d+\s?kJ)\b/gi, '')
+                .replace(/[•*_\-–—]/g, ',')
+                .replace(/\b([A-Z])([A-Z]+)\b/g, (match, p1, p2) => p1 + p2.toLowerCase())
+                .replace(/\b(\w+)\s+\1\b/gi, '$1')
+                .replace(/([a-z])([A-Z])/g, '$1 $2')
+                .replace(/\s{2,}/g, ' ')
+                .replace(/,\s*,/g, ',')
+                .trim();
+
+            // Smart comma and newline handling
+            const lines = cleanedText.split('\n')
+                .map(line => line.trim())
+                .filter(line => line.length > 2 && !/^\d/.test(line));
+
+            // Further processing
+            const finalIngredients = [];
+            lines.forEach(line => {
+                const items = line.split(/(?<!\([^)]*),(?![^(]*\))/g);
+                items.forEach(item => {
+                    item = item.trim()
+                        .replace(/^[.,]+|[.,]+$/g, '')
+                        .replace(/\s*\([^)]*\)/g, '');
+                    
+                    if (item.length > 2 && !/^and$|^or$/i.test(item)) {
+                        finalIngredients.push(item);
+                    }
+                });
+            });
+
+            ingredientsListInput.value = finalIngredients.join('\n');
+            closeImageModal();
+            
+            const productName = productNameInput.value.trim() || "Scanned Product";
+            showResults(productName, finalIngredients);
+            
+        } catch (error) {
+            console.error("OCR Error:", error);
+            ocrProgress.textContent = "Error processing image. Please try again.";
+        } finally {
+            processImageBtn.disabled = false;
+        }
+    }
+
+    function closeImageModal() {
+        if (worker) {
+            worker.terminate();
+            worker = null;
+        }
+        modalMediaContainer.innerHTML = '';
+        imageModal.classList.remove('active');
+        ocrProgress.textContent = "Ready to process";
+    }
+
+    // Initialize the app
+    init();
+});</script>
+</body>
+</html>
