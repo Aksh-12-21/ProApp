@@ -1,0 +1,2751 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>AayushJivinDoneExtra</title>
+  
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <title>Ingredient Safety Checker</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Light mode colors */
+      --primary: #4CAF50;
+      --primary-dark: #388E3C;
+      --text-dark: #212121;
+      --text-medium: #424242;
+      --text-light: #757575;
+      --border-color: #E0E0E0;
+      --background: #FAFAFA;
+      --white: #FFFFFF;
+      --red: #F44336;
+      --orange: #FF9800;
+      --green: #8BC34A;
+      --warning-bg: #FFF3E0;
+      
+      /* Dark mode colors */
+      --dm-background: #121212;
+      --dm-surface: #1E1E1E;
+      --dm-text: #E0E0E0;
+      --dm-border: #333333;
+      --dm-text-light: #B0B0B0;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text-dark);
+      font-size: 14px;
+      line-height: 1.5;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* Dark mode styles */
+    body.dark-mode {
+      background-color: var(--dm-background);
+      color: var(--dm-text);
+    }
+
+    .page {
+      display: none;
+      max-width: 414px;
+      margin: 0 auto;
+      background: var(--white);
+      min-height: 100vh;
+      position: relative;
+      box-shadow: 0 0 14px rgba(0,0,0,0.05);
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    body.dark-mode .page {
+      background-color: var(--dm-surface);
+      box-shadow: 0 0 14px rgba(0,0,0,0.3);
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .header {
+      padding: 16px;
+      border-bottom: 1px solid var(--border-color);
+      text-align: center;
+      position: relative;
+      transition: border-color 0.3s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    body.dark-mode .header {
+      border-bottom-color: var(--dm-border);
+    }
+
+    .header h1 {
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--text-dark);
+      transition: color 0.3s ease;
+    }
+
+    body.dark-mode .header h1 {
+      color: var(--dm-text);
+    }
+
+    /* Header controls container */
+    .header-controls {
+      position: absolute;
+      right: 16px;
+      top: 16px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .dark-mode-toggle, .language-toggle {
+      background: none;
+      border: none;
+      color: var(--text-dark);
+      font-size: 16px;
+      cursor: pointer;
+      padding: 0;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s ease, color 0.3s ease;
+    }
+
+    .dark-mode-toggle:hover, .language-toggle:hover {
+      transform: scale(1.1);
+    }
+
+    body.dark-mode .dark-mode-toggle {
+      color: #FFD700;
+    }
+
+    body.dark-mode .language-toggle {
+      color: var(--dm-text);
+    }
+
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border-color);
+      transition: border-color 0.3s ease;
+    }
+
+    body.dark-mode .tabs {
+      border-bottom-color: var(--dm-border);
+    }
+
+    .tab {
+      flex: 1;
+      padding: 16px;
+      text-align: center;
+      font-weight: 500;
+      color: var(--text-light);
+      position: relative;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    body.dark-mode .tab {
+      color: var(--dm-text-light);
+    }
+
+    .tab.active {
+      color: var(--primary);
+    }
+
+    .tab.active:after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--primary);
+    }
+
+    .content-section {
+      padding: 20px 16px;
+    }
+
+    .input-field {
+      margin-bottom: 24px;
+    }
+
+    .input-field label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: var(--text-medium);
+      transition: color 0.3s ease;
+    }
+
+    body.dark-mode .input-field label {
+      color: var(--dm-text);
+    }
+
+    .input-field input,
+    .input-field textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 14px;
+      background-color: var(--white);
+      color: var(--text-dark);
+      transition: all 0.3s ease;
+    }
+
+    body.dark-mode .input-field input,
+    body.dark-mode .input-field textarea {
+      background-color: var(--dm-surface);
+      border-color: var(--dm-border);
+      color: var(--dm-text);
+    }
+
+    .input-field textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .divider {
+      text-align: center;
+      margin: 24px 0;
+      position: relative;
+    }
+
+    .divider:before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: var(--border-color);
+      z-index: 1;
+      transition: background-color 0.3s ease;
+    }
+
+    body.dark-mode .divider:before {
+      background-color: var(--dm-border);
+    }
+
+    .divider span {
+      position: relative;
+      z-index: 2;
+      background: var(--white);
+      padding: 0 16px;
+      color: var(--text-light);
+      transition: all 0.3s ease;
+    }
+
+    body.dark-mode .divider span {
+      background-color: var(--dm-surface);
+      color: var(--dm-text-light);
+    }
+
+    .scan-card {
+      background: var(--white);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 24px;
+      transition: all 0.3s ease;
+    }
+
+    body.dark-mode .scan-card {
+      background-color: var(--dm-surface);
+      border-color: var(--dm-border);
+    }
+
+    .scan-title {
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 12px;
+      color: var(--text-dark);
+      transition: color 0.3s ease;
+    }
+
+    body.dark-mode .scan-title {
+      color: var(--dm-text);
+    }
+
+    .instructions {
+      margin-bottom: 20px;
+    }
+
+    .instructions ol {
+      padding-left: 20px;
+    }
+
+    .instructions li {
+      margin-bottom: 8px;
+      color: var(--text-medium);
+      transition: color 0.3s ease;
+    }
+
+    body.dark-mode .instructions li {
+      color: var(--dm-text-light);
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      border-radius: 4px;
+      font-weight: 500;
+      text-align: center;
+      margin-bottom: 12px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-secondary {
+      background: var(--white);
+      border: 1px solid var(--border-color);
+      color: var(--text-dark);
+      transition: all 0.3s ease;
+    }
+
+    body.dark-mode .btn-secondary {
+      background-color: var(--dm-surface);
+      border-color: var(--dm-border);
+      color: var(--dm-text);
+    }
+
+    .btn-secondary:hover {
+      background: #F5F5F5;
+    }
+
+    body.dark-mode .btn-secondary:hover {
+      background-color: #2a2a2a;
+    }
+
+    .btn-icon {
+      margin-right: 8px;
+    }
+
+    .btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    .scan-content {
+      padding: 20px;
+    }
+
+    .scan-description {
+      text-align: center;
+      margin-bottom: 24px;
+      color: var(--text-medium);
+      transition: color 0.3s ease;
+    }
+
+    body.dark-mode .scan-description {
+      color: var(--dm-text-light);
+    }
+
+    .scan-actions {
+      margin-top: 32px;
+    }
+
+    .file-input {
+      display: none;
+    }
+
+    .results-content {
+      padding: 16px;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .results-header {
+      margin-bottom: 20px;
+    }
+
+    .results-header h2 {
+      font-size: 20px;
+      font-weight: 500;
+      margin-bottom: 4px;
+      color: var(--text-dark);
+      transition: color 0.3s ease;
+    }
+
+    body.dark-mode .results-header h2 {
+      color: var(--dm-text);
+    }
+
+    .results-header p {
+      color: var(--text-medium);
+      font-size: 14px;
+      transition: color 0.3s ease;
+    }
+
+    body.dark-mode .results-header p {
+      color: var(--dm-text-light);
+    }
+
+    .risk-assessment {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .risk-assessment h3 {
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: var(--text-dark);
+      transition: color 0.3s ease;
+    }
+
+    body.dark-mode .risk-assessment h3 {
+      color: var(--dm-text);
+    }
+
+    .risk-display {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .risk-badge {
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-weight: 500;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .risk-badge.low {
+      background-color: #E8F5E9;
+      color: #2E7D32;
+    }
+
+    .risk-badge.medium {
+      background-color: #FFF3E0;
+      color: #EF6C00;
+    }
+
+    .risk-badge.high {
+      background-color: #FFEBEE;
+      color: #C62828;
+    }
+
+    .risk-meter {
+      height: 24px;
+      background: #EEEEEE;
+      border-radius: 12px;
+      margin: 20px 0;
+      position: relative;
+      overflow: hidden;
+      transition: background-color 0.3s ease;
+    }
+
+    body.dark-mode .risk-meter {
+      background-color: #2a2a2a;
+    }
+
+    .risk-level {
+      position: absolute;
+      height: 100%;
+    }
+
+    .risk-level.low {
+      background: var(--green);
+      width: 33%;
+      left: 0;
+    }
+
+    .risk-level.medium {
+      background: var(--orange);
+      width: 34%;
+      left: 33%;
+    }
+
+    .risk-level.high {
+      background: var(--red);
+      width: 33%;
+      right: 0;
+    }
+
+    .risk-indicator {
+      position: absolute;
+      top: -4px;
+      width: 4px;
+      height: 32px;
+      background: black;
+      transform: translateX(-50%);
+      z-index: 2;
+    }
+
+    .ingredient-item {
+      margin-bottom: 20px;
+      padding: 16px;
+      border-radius: 8px;
+      background: var(--white);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      position: relative;
+      border-left: 4px solid var(--border-color);
+      transition: all 0.3s ease;
+    }
+
+    body.dark-mode .ingredient-item {
+      background-color: var(--dm-surface);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      border-left-color: var(--dm-border);
+    }
+
+    .ingredient-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .ingredient-icon {
+      font-size: 18px;
+      width: 24px;
+      text-align: center;
+    }
+
+    .ingredient-icon.low {
+      color: var(--green);
+    }
+
+    .ingredient-icon.medium {
+      color: var(--orange);
+    }
+
+    .ingredient-icon.high {
+      color: var(--red);
+    }
+
+    .ingredient-name {
+      font-weight: 500;
+      font-size: 16px;
+      flex-grow: 1;
+      color: var(--text-dark);
+      transition: color 0.3s ease;
+    }
+
+    body.dark-mode .ingredient-name {
+      color: var(--dm-text);
+    }
+
+    .ingredient-risk {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .ingredient-risk.low {
+      background: #E8F5E9;
+      color: #2E7D32;
+    }
+
+    .ingredient-risk.medium {
+      background: #FFF3E0;
+      color: #EF6C00;
+    }
+
+    .ingredient-risk.high {
+      background: #FFEBEE;
+      color: #C62828;
+    }
+
+    .ingredient-desc {
+      color: var(--text-medium);
+      font-size: 14px;
+      line-height: 1.5;
+      margin-top: 8px;
+      transition: color 0.3s ease;
+    }
+
+    body.dark-mode .ingredient-desc {
+      color: var(--dm-text-light);
+    }
+
+    .ingredient-reference {
+      font-size: 12px;
+      color: var(--text-light);
+      margin-top: 8px;
+      font-style: italic;
+    }
+
+    body.dark-mode .ingredient-reference {
+      color: var(--dm-text-light);
+    }
+
+    .risk-warning {
+      background: var(--warning-bg);
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #D84315;
+    }
+
+    body.dark-mode .risk-warning {
+      background-color: #33261a;
+      color: #FFAB91;
+    }
+
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-color);
+      transition: all 0.3s ease;
+    }
+
+    body.dark-mode .history-item {
+      border-bottom-color: var(--dm-border);
+    }
+
+    .history-item:hover {
+      background: #f5f5f5;
+    }
+
+    body.dark-mode .history-item:hover {
+      background-color: #2a2a2a;
+    }
+
+    .history-item-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .history-product {
+      font-weight: 500;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--text-dark);
+      transition: color 0.3s ease;
+    }
+
+    body.dark-mode .history-product {
+      color: var(--dm-text);
+    }
+
+    .history-date {
+      font-size: 12px;
+      color: var(--text-light);
+      transition: color 0.3s ease;
+    }
+
+    body.dark-mode .history-date {
+      color: var(--dm-text-light);
+    }
+
+    .history-item-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .history-risk {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .history-risk.low {
+      background: #E8F5E9;
+      color: var(--primary-dark);
+    }
+
+    .history-risk.medium {
+      background: #FFF3E0;
+      color: #EF6C00;
+    }
+
+    .history-risk.high {
+      background: #FFEBEE;
+      color: var(--red);
+    }
+
+    .delete-history-btn {
+      background: none;
+      border: none;
+      color: var(--text-light);
+      cursor: pointer;
+      padding: 5px;
+      font-size: 14px;
+      transition: color 0.2s;
+    }
+
+    body.dark-mode .delete-history-btn {
+      color: var(--dm-text-light);
+    }
+
+    .delete-history-btn:hover {
+      color: var(--red);
+    }
+
+    .history-empty {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-light);
+    }
+
+    body.dark-mode .history-empty {
+      color: var(--dm-text-light);
+    }
+
+    .history-empty i {
+      font-size: 40px;
+      margin-bottom: 15px;
+      color: var(--border-color);
+    }
+
+    body.dark-mode .history-empty i {
+      color: var(--dm-border);
+    }
+
+    .learn-content {
+      padding: 20px;
+    }
+
+    .learn-card {
+      background: var(--white);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+      transition: all 0.3s ease;
+    }
+
+    body.dark-mode .learn-card {
+      background-color: var(--dm-surface);
+      border-color: var(--dm-border);
+    }
+
+    .learn-card h3 {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 16px;
+      color: var(--text-dark);
+      transition: color 0.3s ease;
+    }
+
+    body.dark-mode .learn-card h3 {
+      color: var(--dm-text);
+    }
+
+    .learn-card h3 i {
+      margin-right: 8px;
+      color: var(--primary);
+    }
+
+    .learn-card p {
+      color: var(--text-medium);
+      margin-bottom: 12px;
+      font-size: 14px;
+      transition: color 0.3s ease;
+    }
+
+    body.dark-mode .learn-card p {
+      color: var(--dm-text-light);
+    }
+
+    .learn-more {
+      background: none;
+      border: none;
+      color: var(--primary);
+      font-weight: 500;
+      padding: 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+
+    .learn-more::after {
+      content: "→";
+      margin-left: 4px;
+    }
+
+    .back-btn {
+      position: absolute;
+      left: 16px;
+      top: 16px;
+      background: none;
+      border: none;
+      color: var(--primary);
+      font-size: 16px;
+      cursor: pointer;
+      padding: 0;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--white);
+      padding: 25px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 500px;
+      max-height: 80vh;
+      overflow-y: auto;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    body.dark-mode .modal-content {
+      background-color: var(--dm-surface);
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text-medium);
+      transition: color 0.3s ease;
+    }
+
+    body.dark-mode .close-modal {
+      color: var(--dm-text-light);
+    }
+
+    #modalMediaContainer {
+      width: 100%;
+      margin-bottom: 20px;
+    }
+
+    #modalMediaContainer img,
+    #modalMediaContainer video {
+      width: 100%;
+      border-radius: 8px;
+      max-height: 60vh;
+      object-fit: contain;
+    }
+
+    .ocr-progress {
+      text-align: center;
+      margin: 15px 0;
+      color: var(--primary);
+      font-weight: 500;
+    }
+
+    .loader {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      border-top: 4px solid var(--primary);
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+      display: none;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    #analyzeBtn.loading {
+      position: relative;
+      color: transparent;
+      pointer-events: none;
+    }
+
+    #analyzeBtn.loading::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s linear infinite;
+    }
+
+    #cameraPreview {
+      width: 100%;
+      max-height: 300px;
+      object-fit: contain;
+      background: #000;
+      display: none;
+      margin-bottom: 15px;
+      border-radius: 8px;
+    }
+
+    .camera-controls {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    @media screen and (orientation: landscape) {
+      .scan-content {
+        padding-top: 10px;
+      }
+      #cameraPreview {
+        max-height: 200px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Analyze Page -->
+  <div id="analyzePage" class="page active">
+    <div class="header">
+      <button id="backBtn" class="back-btn" style="visibility: hidden;">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <h1 data-i18n="analyzeTitle">Ingredient Analyzer</h1>
+      <div class="header-controls">
+        <button class="language-toggle">
+          <i class="fas fa-globe"></i>
+        </button>
+        <button class="dark-mode-toggle">
+          <i class="fas fa-moon"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" data-tab="analyze" data-i18n="analyzeTab">Analyze</div>
+      <div class="tab" data-tab="history" data-i18n="historyTab">History</div>
+      <div class="tab" data-tab="learn" data-i18n="learnTab">Learn</div>
+    </div>
+
+    <div class="content-section">
+      <div class="input-field">
+        <label data-i18n="productNameLabel">Product Name (Optional)</label>
+        <input type="text" id="productName" data-i18n-placeholder="productNamePlaceholder" placeholder="e.g., 'Maggie Noodles'">
+      </div>
+
+      <div class="input-field">
+        <label data-i18n="ingredientsLabel">Ingredients List</label>
+        <textarea id="ingredientsList" data-i18n-placeholder="ingredientsPlaceholder" placeholder="Enter ingredients separated by commas or new lines"></textarea>
+      </div>
+
+      <button id="analyzeBtn" class="btn btn-primary">
+        <i class="fas fa-search btn-icon"></i><span data-i18n="analyzeButton">Analyze Ingredients</span>
+      </button>
+
+      <div class="divider">
+        <span data-i18n="orDivider">OR</span>
+      </div>
+
+      <div class="scan-card">
+        <h3 class="scan-title" data-i18n="scanTitle">Scan Ingredients Label</h3>
+        <div class="instructions">
+          <ol>
+            <li data-i18n="scanInstruction1">Take a clear photo of the ingredients list</li>
+            <li data-i18n="scanInstruction2">Ensure text is visible and well-lit</li>
+            <li data-i18n="scanInstruction3">We'll extract ingredients automatically</li>
+          </ol>
+        </div>
+        <button id="scanBtn" class="btn btn-secondary">
+          <i class="fas fa-camera btn-icon"></i><span data-i18n="scanButton">Scan Now</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scan Page -->
+  <div id="scanPage" class="page">
+    <div class="header">
+      <button class="back-btn" id="backFromScan">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <h1 data-i18n="scanPageTitle">Scan Ingredients</h1>
+      <div class="header-controls">
+        <button class="language-toggle">
+          <i class="fas fa-globe"></i>
+        </button>
+        <button class="dark-mode-toggle">
+          <i class="fas fa-moon"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="scan-content">
+      <p class="scan-description" data-i18n="scanDescription">Upload an image of ingredients list</p>
+
+      <div class="scan-instructions">
+        <h3 data-i18n="instructionsTitle">Instructions</h3>
+        <ol>
+          <li data-i18n="scanPageInstruction1">Hold camera parallel to ingredients list</li>
+          <li data-i18n="scanPageInstruction2">Make sure text is clear and not blurry</li>
+          <li data-i18n="scanPageInstruction3">Avoid glare and shadows</li>
+          <li data-i18n="scanPageInstruction4">The app will extract and parse ingredients</li>
+        </ol>
+      </div>
+
+      <video id="cameraPreview" autoplay playsinline></video>
+      
+      <div class="scan-actions">
+        <label for="fileUpload" class="btn btn-secondary">
+          <i class="fas fa-upload btn-icon"></i><span data-i18n="uploadButton">Upload Image</span>
+        </label>
+        <input type="file" id="fileUpload" accept="image/*" class="file-input">
+        
+        <button id="cameraBtn" class="btn btn-secondary">
+          <i class="fas fa-camera btn-icon"></i><span data-i18n="takePhotoButton">Take Photo</span>
+        </button>
+        
+        <button id="captureBtn" class="btn btn-primary" style="display: none;">
+          <i class="fas fa-camera btn-icon"></i><span data-i18n="captureButton">Capture</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results Page -->
+  <div id="resultsPage" class="page">
+    <div class="header">
+      <button class="back-btn" id="backToAnalyze">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <h1 data-i18n="resultsTitle">Analysis Results</h1>
+      <div class="header-controls">
+        <button class="language-toggle">
+          <i class="fas fa-globe"></i>
+        </button>
+        <button class="dark-mode-toggle">
+          <i class="fas fa-moon"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="results-content">
+      <div class="results-header">
+        <h2 id="resultsProductName" data-i18n="scannedProduct">Scanned Product</h2>
+        <p id="ingredientsCount" data-i18n="ingredientsAnalyzed">0 ingredients analyzed</p>
+      </div>
+
+      <div class="risk-assessment">
+        <h3 data-i18n="riskAssessmentTitle">Overall Risk Assessment</h3>
+        <div class="risk-display">
+          <span id="riskLevel" class="risk-badge low">
+            <i class="fas fa-leaf"></i> <span data-i18n="lowRisk">Low Risk</span>
+          </span>
+          <span id="riskScore">Score: 0.0/3.0</span>
+        </div>
+      </div>
+
+      <div class="risk-meter">
+        <div class="risk-level low"></div>
+        <div class="risk-level medium"></div>
+        <div class="risk-level high"></div>
+        <div class="risk-indicator" id="riskIndicator" style="left: 0%"></div>
+      </div>
+
+      <div id="ingredientsAnalysis">
+        <!-- Ingredients will be added here dynamically -->
+      </div>
+
+      <button id="saveAnalysisBtn" class="btn btn-primary">
+        <i class="fas fa-save btn-icon"></i><span data-i18n="saveAnalysisButton">Save Analysis</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- History Page -->
+  <div id="historyPage" class="page">
+    <div class="header">
+      <button class="back-btn" id="backToAnalyzeFromHistory">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <h1 data-i18n="historyTitle">History</h1>
+      <div class="header-controls">
+        <button class="language-toggle" style="visibility: hidden;">>
+          <i class="fas fa-globe"></i>
+        </button>
+        <button class="dark-mode-toggle">
+          <i class="fas fa-moon"></i>
+        </button>
+      </div>
+    </div>
+
+    <div id="historyList">
+      <!-- History items will be added here dynamically -->
+    </div>
+  </div>
+
+  <!-- Learn Page -->
+  <div id="learnPage" class="page">
+    <div class="header">
+      <button class="back-btn" id="backToAnalyzeFromLearn">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <h1 data-i18n="learnTitle">Learn</h1>
+      <div class="header-controls">
+        <button class="language-toggle" style="visibility: hidden;">>
+          <i class="fas fa-globe"></i>
+        </button>
+        <button class="dark-mode-toggle">
+          <i class="fas fa-moon"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="learn-content">
+      <div class="learn-card">
+        <h3><i class="fas fa-prescription-bottle-alt"></i> <span data-i18n="foodAdditivesTitle">Food Additives</span></h3>
+        <p data-i18n="foodAdditivesDesc">Learn about common additives and their potential health effects</p>
+        <button class="learn-more"><span data-i18n="exploreButton">Explore</span> →</button>
+      </div>
+
+      <div class="learn-card">
+        <h3><i class="fas fa-allergies"></i> <span data-i18n="allergensTitle">Common Allergens</span></h3>
+        <p data-i18n="allergensDesc">Identify ingredients that commonly cause allergic reactions</p>
+        <button class="learn-more"><span data-i18n="exploreButton">Explore</span> →</button>
+      </div>
+
+      <div class="learn-card">
+        <h3><i class="fas fa-shield-alt"></i> <span data-i18n="preservativesTitle">Preservatives</span></h3>
+        <p data-i18n="preservativesDesc">Understand different types of preservatives used in products</p>
+        <button class="learn-more"><span data-i18n="exploreButton">Explore</span> →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Image Preview Modal -->
+  <div id="imageModal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <div id="modalMediaContainer"></div>
+      <div class="ocr-progress" data-i18n="ocrReady">Ready to process</div>
+      <button id="processImageBtn" class="btn btn-primary">
+        <i class="fas fa-magic btn-icon"></i><span data-i18n="extractButton">Extract Ingredients</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- History Item Template -->
+  <template id="historyItemTemplate">
+    <div class="history-item">
+      <div class="history-item-content">
+        <div class="history-product"></div>
+        <div class="history-date"></div>
+      </div>
+      <div class="history-item-actions">
+        <span class="history-risk"></span>
+        <button class="delete-history-btn">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+    </div>
+  </template>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.1.1/tesseract.min.js"></script>
+  <script>
+    // Ingredient Safety Checker - Complete JavaScript with Hindi Language Support
+    document.addEventListener('DOMContentLoaded', function() {
+      // DOM Elements
+      const pages = {
+        analyze: document.getElementById('analyzePage'),
+        scan: document.getElementById('scanPage'),
+        results: document.getElementById('resultsPage'),
+        history: document.getElementById('historyPage'),
+        learn: document.getElementById('learnPage')
+      };
+
+      const tabs = document.querySelectorAll('.tab');
+      const analyzeBtn = document.getElementById('analyzeBtn');
+      const scanBtn = document.getElementById('scanBtn');
+      const backBtns = {
+        scan: document.getElementById('backFromScan'),
+        results: document.getElementById('backToAnalyze'),
+        history: document.getElementById('backToAnalyzeFromHistory'),
+        learn: document.getElementById('backToAnalyzeFromLearn')
+      };
+      const saveAnalysisBtn = document.getElementById('saveAnalysisBtn');
+      const fileUpload = document.getElementById('fileUpload');
+      const productNameInput = document.getElementById('productName');
+      const ingredientsListInput = document.getElementById('ingredientsList');
+      const resultsProductName = document.getElementById('resultsProductName');
+      const ingredientsCount = document.getElementById('ingredientsCount');
+      const riskLevel = document.getElementById('riskLevel');
+      const riskScore = document.getElementById('riskScore');
+      const riskIndicator = document.getElementById('riskIndicator');
+      const ingredientsAnalysis = document.getElementById('ingredientsAnalysis');
+      const historyList = document.getElementById('historyList');
+      const imageModal = document.getElementById('imageModal');
+      const modalMediaContainer = document.getElementById('modalMediaContainer');
+      const closeModal = document.querySelector('.close-modal');
+      const cameraBtn = document.getElementById('cameraBtn');
+      const captureBtn = document.getElementById('captureBtn');
+      const cameraPreview = document.getElementById('cameraPreview');
+      const processImageBtn = document.getElementById('processImageBtn');
+      const ocrProgress = document.querySelector('.ocr-progress');
+      const darkModeToggles = document.querySelectorAll('.dark-mode-toggle');
+      const languageToggle = document.querySelector('.language-toggle');
+
+      // Camera stream and OCR worker
+      let cameraStream = null;
+      let worker = null;
+
+      // Language support
+      const translations = {
+        en: {
+          analyzeTitle: "Ingredient Analyzer",
+          analyzeTab: "Analyze",
+          historyTab: "History",
+          learnTab: "Learn",
+          productNameLabel: "Product Name (Optional)",
+          productNamePlaceholder: "e.g., 'Maggie Noodles'",
+          ingredientsLabel: "Ingredients List",
+          ingredientsPlaceholder: "Enter ingredients separated by commas or new lines",
+          analyzeButton: "Analyze Ingredients",
+          orDivider: "OR",
+          scanTitle: "Scan Ingredients Label",
+          scanInstruction1: "Take a clear photo of the ingredients list",
+          scanInstruction2: "Ensure text is visible and well-lit",
+          scanInstruction3: "We'll extract ingredients automatically",
+          scanButton: "Scan Now",
+          scanPageTitle: "Scan Ingredients",
+          scanDescription: "Upload an image of ingredients list",
+          instructionsTitle: "Instructions",
+          scanPageInstruction1: "Hold camera parallel to ingredients list",
+          scanPageInstruction2: "Make sure text is clear and not blurry",
+          scanPageInstruction3: "Avoid glare and shadows",
+          scanPageInstruction4: "The app will extract and parse ingredients",
+          uploadButton: "Upload Image",
+          takePhotoButton: "Take Photo",
+          captureButton: "Capture",
+          resultsTitle: "Analysis Results",
+          scannedProduct: "Scanned Product",
+          ingredientsAnalyzed: "0 ingredients analyzed",
+          riskAssessmentTitle: "Overall Risk Assessment",
+          lowRisk: "Low Risk",
+          mediumRisk: "Medium Risk",
+          highRisk: "High Risk",
+          saveAnalysisButton: "Save Analysis",
+          historyTitle: "History",
+          learnTitle: "Learn",
+          foodAdditivesTitle: "Food Additives",
+          foodAdditivesDesc: "Learn about common additives and their potential health effects",
+          allergensTitle: "Common Allergens",
+          allergensDesc: "Identify ingredients that commonly cause allergic reactions",
+          preservativesTitle: "Preservatives",
+          preservativesDesc: "Understand different types of preservatives used in products",
+          exploreButton: "Explore",
+          ocrReady: "Ready to process",
+          extractButton: "Extract Ingredients",
+          noHistory: "No analysis history yet"
+        },
+        hi: {
+          analyzeTitle: "सामग्री विश्लेषक",
+          analyzeTab: "विश्लेषण",
+          historyTab: "इतिहास",
+          learnTab: "सीखें",
+          productNameLabel: "उत्पाद का नाम (वैकल्पिक)",
+          productNamePlaceholder: "जैसे, 'मैगी नूडल्स'",
+          ingredientsLabel: "सामग्री सूची",
+          ingredientsPlaceholder: "सामग्री को अल्पविराम या नई पंक्तियों से अलग करके दर्ज करें",
+          analyzeButton: "सामग्री का विश्लेषण करें",
+          orDivider: "या",
+          scanTitle: "सामग्री लेबल स्कैन करें",
+          scanInstruction1: "सामग्री सूची की एक स्पष्ट तस्वीर लें",
+          scanInstruction2: "सुनिश्चित करें कि पाठ दिखाई दे रहा है और अच्छी तरह से रोशन है",
+          scanInstruction3: "हम स्वचालित रूप से सामग्री निकाल देंगे",
+          scanButton: "अभी स्कैन करें",
+          scanPageTitle: "सामग्री स्कैन करें",
+          scanDescription: "सामग्री सूची की एक छवि अपलोड करें",
+          instructionsTitle: "निर्देश",
+          scanPageInstruction1: "कैमरा को सामग्री सूची के समानांतर पकड़ें",
+          scanPageInstruction2: "सुनिश्चित करें कि पाठ स्पष्ट और धुंधला नहीं है",
+          scanPageInstruction3: "चकाचौंध और छाया से बचें",
+          scanPageInstruction4: "ऐप सामग्री निकालेगा और पार्स करेगा",
+          uploadButton: "छवि अपलोड करें",
+          takePhotoButton: "तस्वीर लें",
+          captureButton: "कैप्चर करें",
+          resultsTitle: "विश्लेषण परिणाम",
+          scannedProduct: "स्कैन किया गया उत्पाद",
+          ingredientsAnalyzed: "0 सामग्रियों का विश्लेषण किया गया",
+          riskAssessmentTitle: "समग्र जोखिम मूल्यांकन",
+          lowRisk: "कम जोखिम",
+          mediumRisk: "मध्यम जोखिम",
+          highRisk: "उच्च जोखिम",
+          saveAnalysisButton: "विश्लेषण सहेजें",
+          historyTitle: "इतिहास",
+          learnTitle: "सीखें",
+          foodAdditivesTitle: "खाद्य योजक",
+          foodAdditivesDesc: "सामान्य योजक और उनके संभावित स्वास्थ्य प्रभावों के बारे में जानें",
+          allergensTitle: "सामान्य एलर्जी",
+          allergensDesc: "ऐसी सामग्री की पहचान करें जो आमतौर पर एलर्जी प्रतिक्रियाएं पैदा करती हैं",
+          preservativesTitle: "परिरक्षक",
+          preservativesDesc: "उत्पादों में उपयोग किए जाने वाले विभिन्न प्रकार के परिरक्षकों को समझें",
+          exploreButton: "अन्वेषण करें",
+          ocrReady: "प्रसंस्करण के लिए तैयार",
+          extractButton: "सामग्री निकालें",
+          noHistory: "अभी तक कोई विश्लेषण इतिहास नहीं"
+        }
+      };
+
+      let currentLanguage = localStorage.getItem('language') || 'en';
+
+      // Complete Ingredient Database (same as before)
+      const ingredientDatabase = {
+  "Potato": {
+            risk: "low",
+            desc: "Natural vegetable, generally safe and nutritious.",
+            icon: "fas fa-seedling",
+            category: "vegetables"
+        },
+        "Edible Vegetable Oil": {
+            risk: "low",
+            desc: "Plant-based oils, nutritional value depends on specific type.",
+            icon: "fas fa-oil-can",
+            category: "fats"
+        },
+        "Salt": {
+            risk: "medium",
+            desc: "Excessive sodium intake may lead to high blood pressure.",
+            icon: "fas fa-mortar-pestle",
+            category: "minerals",
+            reference: "WHO Sodium Guidelines"
+        },
+        "Sugar": {
+            risk: "medium",
+            desc: "Excessive consumption linked to weight gain and diabetes.",
+            icon: "fas fa-cube",
+            category: "sweeteners",
+            reference: "WHO Sugar Guidelines"
+        },
+        "Wheat Flour": {
+            risk: "medium",
+            desc: "High glycemic index causing blood sugar spikes.",
+            icon: "fas fa-bread-slice",
+            category: "grains"
+        },
+        "Palm Oil": {
+            risk: "medium",
+            desc: "High in saturated fats linked to heart disease.",
+            icon: "fas fa-oil-can",
+            category: "fats",
+            reference: "WHO Guidelines"
+        },
+
+        // Additives and E-numbers
+        "Potassium Chloride (508)": {
+            risk: "medium",
+            desc: "Gelling agent. May cause hyperkalemia in sensitive individuals.",
+            icon: "fas fa-heartbeat",
+            category: "thickeners",
+            reference: "FDA GRAS Notice"
+        },
+        "Guar Gum (412)": {
+            risk: "low",
+            desc: "Natural thickener. May cause digestive issues.",
+            icon: "fas fa-seedling",
+            category: "thickeners"
+        },
+        "Citric Acid (330)": {
+            risk: "low",
+            desc: "Common preservative. May erode tooth enamel.",
+            icon: "fas fa-lemon",
+            category: "preservatives"
+        },
+        "TBHQ": {
+            risk: "high",
+            desc: "Preservative with potential cancer risk at high doses.",
+            icon: "fas fa-radiation-alt",
+            category: "preservatives",
+            reference: "IARC Monographs"
+        },
+        "Disodium 5'-Ribonucleotides (635)": {
+            risk: "medium",
+            desc: "Flavor enhancer similar to MSG.",
+            icon: "fas fa-head-side-virus",
+            category: "flavor enhancers"
+        },
+        "Sodium Benzoate": {
+            risk: "high",
+            desc: "Preservative that may form carcinogenic benzene with vitamin C.",
+            icon: "fas fa-prescription-bottle-alt",
+            category: "preservatives",
+            reference: "FDA Report"
+        },
+        "Monosodium Glutamate (MSG)": {
+            risk: "medium",
+            desc: "Flavor enhancer that may cause headaches in sensitive individuals.",
+            icon: "fas fa-head-side-virus",
+            category: "flavor enhancers"
+        },
+        "High Fructose Corn Syrup": {
+            risk: "high",
+            desc: "Linked to obesity, diabetes and fatty liver disease.",
+            icon: "fas fa-weight",
+            category: "sweeteners",
+            reference: "AJCN Study"
+        },
+        "Sodium Nitrite": {
+            risk: "high",
+            desc: "Preservative that may form carcinogenic nitrosamines.",
+            icon: "fas fa-drumstick-bite",
+            category: "preservatives",
+            reference: "WHO IARC"
+        },
+        "Caramel Color (150d)": {
+            risk: "medium",
+            desc: "May contain 4-MEI which has potential carcinogenic effects.",
+            icon: "fas fa-palette",
+            category: "colorings",
+            reference: "IARC Evaluation"
+        },
+        "Acesulfame K": {
+            risk: "medium",
+            desc: "Artificial sweetener with debated cancer links.",
+            icon: "fas fa-exclamation-triangle",
+            category: "artificial sweeteners"
+        },
+        "Sucralose (E955)": {
+            risk: "medium",
+            desc: "Artificial sweetener that may affect gut health.",
+            icon: "fas fa-pills",
+            category: "artificial sweeteners"
+        },
+        "Potassium Sorbate": {
+            risk: "low",
+            desc: "Preservative that may cause allergic reactions.",
+            icon: "fas fa-prescription-bottle-alt",
+            category: "preservatives"
+        },
+        "Sodium Metabisulfite (223)": {
+            risk: "high",
+            desc: "Can trigger asthma and allergic reactions.",
+            icon: "fas fa-lungs",
+            category: "preservatives",
+            reference: "FDA Allergen Notice"
+        },
+        "Sodium Sulphite (220)": {
+            risk: "high",
+            desc: "Preservative that can cause respiratory issues.",
+            icon: "fas fa-lungs",
+            category: "preservatives"
+        },
+        "Calcium Disodium EDTA (E385)": {
+            risk: "medium",
+            desc: "Preservative problematic for those with kidney issues.",
+            icon: "fas fa-kidneys",
+            category: "preservatives"
+        },
+
+        // Energy Drink Components
+        "Taurine": {
+            risk: "medium",
+            desc: "May affect cardiovascular system with caffeine.",
+            icon: "fas fa-heartbeat",
+            category: "supplements",
+            reference: "EFSA Assessment"
+        },
+        "Caffeine": {
+            risk: "medium",
+            desc: "May cause anxiety, insomnia in high doses.",
+            icon: "fas fa-coffee",
+            category: "stimulants"
+        },
+        "Inositol": {
+            risk: "low",
+            desc: "May cause digestive issues at high doses.",
+            icon: "fas fa-exclamation-circle",
+            category: "supplements"
+        },
+        "Beta Carotene": {
+            risk: "low",
+            desc: "Natural coloring and vitamin A source.",
+            icon: "fas fa-palette",
+            category: "colorings"
+        },
+    "Noodle Cake Wheat Flour": {
+    risk: "medium",
+    desc: "Processed wheat product; high in carbs, may spike blood sugar.",
+    icon: "fas fa-bread-slice",
+    category: "grains"
+  },
+  "Stabilisers (Sodium Tripolyphosphate, Guar Gum, Potassium Carbonate, Sodium Carbonate)": {
+    risk: "medium",
+    desc: "Used to maintain texture; may cause digestive issues in sensitive people.",
+    icon: "fas fa-vial",
+    category: "stabilizers"
+  },
+  "Mineral Soup Mix Salt": {
+    risk: "medium",
+    desc: "High sodium content from salt and added minerals.",
+    icon: "fas fa-mortar-pestle",
+    category: "minerals"
+  },
+  "Flavour Enhancer": {
+    risk: "medium",
+    desc: "Typically refers to MSG or similar compounds; may cause headaches in some people.",
+    icon: "fas fa-head-side-virus",
+    category: "flavor enhancers"
+  },
+  "Blended Palm Oil and Stearin": {
+    risk: "medium",
+    desc: "High in saturated fats; linked to heart risks when consumed in excess.",
+    icon: "fas fa-oil-can",
+    category: "fats"
+  },
+  "Tapioca Starch": {
+    risk: "low",
+    desc: "Starch extracted from cassava; mostly carbohydrates.",
+    icon: "fas fa-seedling",
+    category: "carbohydrates"
+  },
+  "Chilli": {
+    risk: "low",
+    desc: "Natural spice; can cause irritation in sensitive individuals.",
+    icon: "fas fa-pepper-hot",
+    category: "spices"
+  },
+  "Maltodextrin": {
+    risk: "medium",
+    desc: "Highly processed starch; high glycemic index.",
+    icon: "fas fa-cubes",
+    category: "carbohydrates"
+  },
+  "Garlic": {
+    risk: "low",
+    desc: "Natural seasoning with antioxidant properties.",
+    icon: "fas fa-seedling",
+    category: "spices"
+  },
+  "Coriander": {
+    risk: "low",
+    desc: "Herb used for flavoring; low risk for most.",
+    icon: "fas fa-leaf",
+    category: "spices"
+  },
+  "Spices": {
+    risk: "low",
+    desc: "Generic term; includes a variety of natural flavorings.",
+    icon: "fas fa-pepper-hot",
+    category: "spices"
+  },
+  "Flavourings": {
+    risk: "medium",
+    desc: "Can be natural or synthetic; details often unspecified.",
+    icon: "fas fa-flask",
+    category: "flavor enhancers"
+  },
+  "Onion": {
+    risk: "low",
+    desc: "Natural vegetable with anti-inflammatory properties.",
+    icon: "fas fa-seedling",
+    category: "vegetables"
+  },
+  "Cumin": {
+    risk: "low",
+    desc: "Spice known for digestive benefits.",
+    icon: "fas fa-leaf",
+    category: "spices"
+  },
+  "Acidity Regulator": {
+    risk: "medium",
+    desc: "Maintains pH; examples include citric acid, sodium citrate.",
+    icon: "fas fa-balance-scale",
+    category: "acidity regulators"
+  },
+  "Aniseed": {
+    risk: "low",
+    desc: "Aromatic spice with digestive and flavoring uses.",
+    icon: "fas fa-star",
+    category: "spices"
+  },
+  "Colouring (Caramel)": {
+    risk: "medium",
+    desc: "Caramel color may contain 4-MEI, a potential carcinogen.",
+    icon: "fas fa-palette",
+    category: "colorings",
+    reference: "IARC Evaluation"
+  },
+  "Stabiliser": {
+    risk: "medium",
+    desc: "Used to maintain texture and consistency.",
+    icon: "fas fa-vial",
+    category: "stabilizers"
+  },
+  "Anticaking Agent (Silicone Dioxide)": {
+    risk: "low",
+    desc: "Prevents clumping; generally recognized as safe.",
+    icon: "fas fa-prescription-bottle-alt",
+    category: "anticaking agents"
+  },
+  "Permitted Stabilisers": {
+    risk: "medium",
+    desc: "Broad category; may include phosphates or gums.",
+    icon: "fas fa-vial",
+    category: "stabilizers"
+  },
+  "Colouring and Anticaking Agent": {
+    risk: "medium",
+    desc: "Combination additives; varies by specific compound.",
+    icon: "fas fa-spray-can",
+    category: "additives"
+  },
+
+  // Allergens
+  "Crustacean": {
+    risk: "high",
+    desc: "Common allergen; can trigger severe reactions.",
+    icon: "fas fa-allergies",
+    category: "allergens"
+  },
+  "Fish": {
+    risk: "high",
+    desc: "Common allergen; also a source of omega-3.",
+    icon: "fas fa-fish",
+    category: "allergens"
+  },
+  "Milk": {
+    risk: "medium",
+    desc: "May cause issues for lactose intolerant individuals.",
+    icon: "fas fa-glass-whiskey",
+    category: "allergens"
+  },
+  "Celery": {
+    risk: "medium",
+    desc: "Common allergen in processed foods.",
+    icon: "fas fa-leaf",
+    category: "allergens"
+  },
+  "Mustard": {
+    risk: "medium",
+    desc: "Allergen with potential to cause anaphylaxis.",
+    icon: "fas fa-seedling",
+    category: "allergens"
+  },
+  "Molluscs": {
+    risk: "high",
+    desc: "Shellfish category; major allergen group.",
+    icon: "fas fa-water",
+    category: "allergens"
+  },
+   "Whole Bengal Gram (Chana)": {
+    risk: "low",
+    desc: "High-protein legume; good for digestion and heart health.",
+    icon: "fas fa-seedling",
+    category: "legumes"
+  },
+  "Refined Palmolein Oil": {
+    risk: "medium",
+    desc: "Refined oil high in saturated fats; may raise cholesterol.",
+    icon: "fas fa-oil-can",
+    category: "fats"
+  },
+  "Iodised Salt": {
+    risk: "low",
+    desc: "Essential iodine source; safe in moderation.",
+    icon: "fas fa-salt-shaker",
+    category: "minerals"
+  },
+  "Red Chilli Powder": {
+    risk: "low",
+    desc: "Spice rich in capsaicin; may irritate sensitive stomachs.",
+    icon: "fas fa-pepper-hot",
+    category: "spices"
+  },
+  "Dried Mango Powder (Amchur)": {
+    risk: "low",
+    desc: "Tangy spice from unripe mango; aids digestion.",
+    icon: "fas fa-leaf",
+    category: "spices"
+  },
+  "Black Salt": {
+    risk: "low",
+    desc: "Salt with sulfur compounds; enhances flavor, used in Ayurvedic remedies.",
+    icon: "fas fa-salt-shaker",
+    category: "minerals"
+  },
+  "Turmeric Powder": {
+    risk: "low",
+    desc: "Anti-inflammatory spice; rich in curcumin.",
+    icon: "fas fa-seedling",
+    category: "spices"
+  },
+  "Acidity Regulator": {
+    risk: "medium",
+    desc: "Maintains pH balance; examples include citric acid, sodium citrate.",
+    icon: "fas fa-balance-scale",
+    category: "acidity regulators"
+  },
+  "Cumin Powder": {
+    risk: "low",
+    desc: "Spice with digestive and antioxidant properties.",
+    icon: "fas fa-leaf",
+    category: "spices"
+  },
+  "Coriander Powder": {
+    risk: "low",
+    desc: "Spice made from ground coriander seeds; aromatic and cooling.",
+    icon: "fas fa-leaf",
+    category: "spices"
+  },
+  "Black Pepper": {
+    risk: "low",
+    desc: "Pungent spice; enhances nutrient absorption.",
+    icon: "fas fa-pepper-hot",
+    category: "spices"
+  },
+  "Pippali (Long Pepper)": {
+    risk: "low",
+    desc: "Traditional Ayurvedic spice; aids respiratory health.",
+    icon: "fas fa-seedling",
+    category: "spices"
+  },
+  "Dried Ginger Powder": {
+    risk: "low",
+    desc: "Dried root spice; anti-inflammatory and digestive aid.",
+    icon: "fas fa-seedling",
+    category: "spices"
+  },
+  "Clove Powder": {
+    risk: "low",
+    desc: "Spice with strong aroma and antibacterial properties.",
+    icon: "fas fa-seedling",
+    category: "spices"
+  },
+  "Nutmeg": {
+    risk: "medium",
+    desc: "Warm spice; safe in small amounts, toxic in large doses.",
+    icon: "fas fa-seedling",
+    category: "spices"
+  },
+  "Bay Leaf": {
+    risk: "low",
+    desc: "Aromatic leaf used in cooking; removed before consumption.",
+    icon: "fas fa-leaf",
+    category: "spices"
+  },
+  "Cinnamon": {
+    risk: "low",
+    desc: "Sweet, aromatic spice; supports blood sugar control.",
+    icon: "fas fa-seedling",
+    category: "spices"
+  },
+  "Asafoetida (Hing)": {
+    risk: "low",
+    desc: "Pungent spice; used in Indian cuisine and for digestion.",
+    icon: "fas fa-leaf",
+    category: "spices"
+  },
+    "Agar-Agar (406)": {
+        risk: "low",
+        desc: "Plant-based gelatin substitute from seaweed. May cause bloating.",
+        icon: "fas fa-leaf",
+        category: "thickeners"
+    },
+    "Xanthan Gum (415)": {
+        risk: "low",
+        desc: "Fermentation-derived thickener. May cause digestive sensitivity.",
+        icon: "fas fa-microscope",
+        category: "thickeners"
+    },
+    "Annatto (160b)": {
+        risk: "medium",
+        desc: "Natural orange coloring. Rare allergic reactions reported.",
+        icon: "fas fa-palette",
+        category: "colorings"
+    },
+    "Lecithin (322)": {
+        risk: "low",
+        desc: "Emulsifier from soy/eggs. Generally safe but may contain allergens.",
+        icon: "fas fa-atom",
+        category: "emulsifiers"
+    },
+    "BHA (320)": {
+        risk: "high",
+        desc: "Antioxidant preservative with potential carcinogenic effects.",
+        icon: "fas fa-radiation-alt",
+        category: "preservatives",
+        reference: "IARC Group 2B"
+    },
+    "Carrageenan (407)": {
+        risk: "medium",
+        desc: "Seaweed-derived thickener. Debated link to intestinal inflammation.",
+        icon: "fas fa-water",
+        category: "thickeners"
+    },
+    "Maltitol (965)": {
+        risk: "medium",
+        desc: "Sugar alcohol. May cause laxative effect in large amounts.",
+        icon: "fas fa-pills",
+        category: "sugar alcohols"
+    },
+    "Erythritol (968)": {
+        risk: "low",
+        desc: "Natural sugar alcohol. Generally well-tolerated.",
+        icon: "fas fa-seedling",
+        category: "sugar alcohols"
+    },
+    "Titanium Dioxide (171)": {
+        risk: "high",
+        desc: "White pigment. Nano particles may have health concerns.",
+        icon: "fas fa-exclamation-triangle",
+        category: "colorings",
+        reference: "EFSA Re-evaluation"
+    },
+    "Propylene Glycol (1520)": {
+        risk: "medium",
+        desc: "Humectant. Safe in small amounts but controversial in processed foods.",
+        icon: "fas fa-flask",
+        category: "humectants"
+    },
+    "Gellan Gum (418)": {
+        risk: "low",
+        desc: "Fermentation-derived gelling agent. Minimal absorption.",
+        icon: "fas fa-dna",
+        category: "thickeners"
+    },
+    "Stevia (960)": {
+        risk: "low",
+        desc: "Natural zero-calorie sweetener. May have aftertaste.",
+        icon: "fas fa-leaf",
+        category: "natural sweeteners"
+    },
+    "Phosphoric Acid (338)": {
+        risk: "medium",
+        desc: "Acidulant in sodas. May affect bone density with excessive consumption.",
+        icon: "fas fa-bone",
+        category: "acidity regulators"
+    },
+    "Sodium Alginate (401)": {
+        risk: "low",
+        desc: "Seaweed-derived thickener. Used in molecular gastronomy.",
+        icon: "fas fa-water",
+        category: "thickeners"
+    },
+    "L-Cysteine (920)": {
+        risk: "medium",
+        desc: "Dough conditioner. Often derived from human hair/animal feathers.",
+        icon: "fas fa-bread-slice",
+        category: "dough conditioners"
+    },
+    "Calcium Propionate (282)": {
+        risk: "medium",
+        desc: "Mold inhibitor. May be linked to irritability in children.",
+        icon: "fas fa-shield-virus",
+        category: "preservatives"
+    },
+    "Sulfites (220-228)": {
+        risk: "high",
+        desc: "Preservative group. Can trigger asthma attacks.",
+        icon: "fas fa-lungs-virus",
+        category: "preservatives",
+        reference: "FDA Allergen List"
+    },
+    "Azodicarbonamide (927a)": {
+        risk: "high",
+        desc: "Flour bleaching agent. Banned in EU/Australia.",
+        icon: "fas fa-skull-crossbones",
+        category: "flour treatment",
+        reference: "WHO Alert"
+    },
+    "Brominated Vegetable Oil (BVO)": {
+        risk: "high",
+        desc: "Emulsifier in citrus drinks. Accumulates in body fat.",
+        icon: "fas fa-exclamation-circle",
+        category: "emulsifiers",
+        reference: "FDA Restricted Use"
+    },
+ "Olive Oil": {
+    risk: "low",
+    desc: "Heart-healthy monounsaturated fats. May oxidize at high heat.",
+    icon: "fas fa-oil-can",
+    category: "fats"
+},
+"Butter": {
+    risk: "medium",
+    desc: "High in saturated fat. Natural but calorie-dense.",
+    icon: "fas fa-cheese",
+    category: "dairy"
+},
+"Honey": {
+    risk: "low",
+    desc: "Natural sweetener with antioxidants. Avoid for infants under 1 year.",
+    icon: "fas fa-honey-pot",
+    category: "sweeteners"
+},
+"White Rice": {
+    risk: "medium",
+    desc: "Refined grain; may spike blood sugar. Low in fiber.",
+    icon: "fas fa-bread-slice",
+    category: "grains"
+},
+"Brown Rice": {
+    risk: "low",
+    desc: "Whole grain with more fiber and nutrients than white rice.",
+    icon: "fas fa-seedling",
+    category: "grains"
+},
+"Eggs": {
+    risk: "low",
+    desc: "High-quality protein. Some cholesterol concerns debated.",
+    icon: "fas fa-egg",
+    category: "animal products"
+},
+"Milk (Whole)": {
+    risk: "medium",
+    desc: "Nutrient-rich but contains lactose and saturated fat.",
+    icon: "fas fa-glass-whiskey",
+    category: "dairy"
+},
+"Almond Milk": {
+    risk: "low",
+    desc: "Plant-based alternative. Low-calorie but often fortified.",
+    icon: "fas fa-nut",
+    category: "plant milks"
+},
+"Soy Sauce": {
+    risk: "medium",
+    desc: "High sodium. Traditional fermentation is healthier than chemical hydrolysis.",
+    icon: "fas fa-flask",
+    category: "condiments"
+},
+"Vinegar": {
+    risk: "low",
+    desc: "Fermented liquid. May aid digestion but acidic in excess.",
+    icon: "fas fa-wine-bottle",
+    category: "condiments"
+},
+"Baking Soda": {
+    risk: "low",
+    desc: "Leavening agent. Safe in small amounts but high sodium.",
+    icon: "fas fa-mortar-pestle",
+    category: "leavening agents"
+},
+"Yeast": {
+    risk: "low",
+    desc: "Microorganism for fermentation. May cause bloating in some.",
+    icon: "fas fa-microscope",
+    category: "leavening agents"
+},
+"Cornstarch": {
+    risk: "low",
+    desc: "Refined thickener. High glycemic index.",
+    icon: "fas fa-seedling",
+    category: "thickeners"
+},
+"Peanut Butter": {
+    risk: "low",
+    desc: "High in healthy fats. Avoid if allergic.",
+    icon: "fas fa-seedling",
+    category: "spreads"
+},
+"Maple Syrup": {
+    risk: "low",
+    desc: "Natural sweetener with minerals. Still high in sugar.",
+    icon: "fas fa-leaf",
+    category: "sweeteners"
+},
+"Coconut Oil": {
+    risk: "medium",
+    desc: "High in saturated fats. Controversial heart health effects.",
+    icon: "fas fa-oil-can",
+    category: "fats"
+},
+"Vanilla Extract": {
+    risk: "low",
+    desc: "Natural flavoring from vanilla beans. Alcohol-based but safe.",
+    icon: "fas fa-seedling",
+    category: "flavorings"
+},
+"Gelatin": {
+    risk: "low",
+    desc: "Animal-derived protein. Used in desserts and gummies.",
+    icon: "fas fa-bone",
+    category: "thickeners"
+},
+"Tomato Paste": {
+    risk: "low",
+    desc: "Concentrated tomatoes. Rich in lycopene but may contain additives.",
+    icon: "fas fa-apple-alt",
+    category: "vegetables"
+},
+"Oats": {
+    risk: "low",
+    desc: "Whole grain high in fiber. Good for heart health.",
+    icon: "fas fa-seedling",
+    category: "grains"
+},
+"Natural Flavors": {
+    risk: "medium",
+    desc: "Derived from plants/animals but processing varies. May contain hidden allergens.",
+    icon: "fas fa-flask",
+    category: "flavorings"
+},
+"Artificial Flavors": {
+    risk: "medium",
+    desc: "Chemically synthesized. Safety depends on specific compounds.",
+    icon: "fas fa-atom",
+    category: "flavorings"
+},
+"Corn Syrup": {
+    risk: "high",
+    desc: "Highly processed sweetener. Linked to obesity and diabetes.",
+    icon: "fas fa-exclamation-triangle",
+    category: "sweeteners"
+},
+"Vegetable Glycerin": {
+    risk: "low",
+    desc: "Plant-based humectant. Generally safe in small amounts.",
+    icon: "fas fa-leaf",
+    category: "humectants"
+},
+"Silicon Dioxide (551)": {
+    risk: "low",
+    desc: "Anti-caking agent. Inert and passes through the body.",
+    icon: "fas fa-prescription-bottle-alt",
+    category: "anticaking agents"
+},
+"Calcium Chloride": {
+    risk: "low",
+    desc: "Firming agent in canned foods. Safe but may taste salty.",
+    icon: "fas fa-flask",
+    category: "stabilizers"
+},
+"Lactic Acid": {
+    risk: "low",
+    desc: "Naturally occurring acidulant. Used in dairy and fermented foods.",
+    icon: "fas fa-seedling",
+    category: "acidity regulators"
+}
+    };
+      // Initialize the app
+      function init() {
+        setupEventListeners();
+        loadHistory();
+        initDarkMode();
+        translatePage();
+        
+        if (!localStorage.getItem('analysisHistory')) {
+          const sampleHistory = [
+            {
+              id: 1,
+              productName: currentLanguage === 'en' ? "Sample Instant Noodles" : "नमूना इंस्टेंट नूडल्स",
+              ingredientCount: "8",
+              score: "2.1/3.0",
+              level: "high",
+              date: new Date().toLocaleDateString(currentLanguage === 'en' ? 'en-US' : 'hi-IN'),
+              ingredients: ["Wheat Flour", "Palm Oil", "Salt", "MSG", "TBHQ", "Artificial Colors", "Sodium Triphosphate", "Sugar"]
+            },
+            {
+              id: 2,
+              productName: currentLanguage === 'en' ? "Energy Drink Sample" : "ऊर्जा पेय नमूना",
+              ingredientCount: "5",
+              score: "1.8/3.0",
+              level: "medium",
+              date: new Date().toLocaleDateString(currentLanguage === 'en' ? 'en-US' : 'hi-IN'),
+              ingredients: ["Taurine", "Caffeine", "Sucralose", "Acesulfame K", "Citric Acid"]
+            }
+          ];
+          localStorage.setItem('analysisHistory', JSON.stringify(sampleHistory));
+        }
+      }
+
+      // Language functions
+      function translatePage() {
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+          const key = el.getAttribute('data-i18n');
+          if (translations[currentLanguage][key]) {
+            el.textContent = translations[currentLanguage][key];
+          }
+        });
+
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+          const key = el.getAttribute('data-i18n-placeholder');
+          if (translations[currentLanguage][key]) {
+            el.setAttribute('placeholder', translations[currentLanguage][key]);
+          }
+        });
+
+        // Update risk level text
+        if (riskLevel) {
+          const riskText = riskLevel.className.includes('low') ? 'lowRisk' : 
+                          riskLevel.className.includes('medium') ? 'mediumRisk' : 'highRisk';
+          riskLevel.querySelector('span').textContent = translations[currentLanguage][riskText];
+        }
+
+        // Update history empty state
+        if (document.querySelector('.history-empty p')) {
+          document.querySelector('.history-empty p').textContent = translations[currentLanguage]['noHistory'];
+        }
+      }
+
+      function toggleLanguage() {
+        currentLanguage = currentLanguage === 'en' ? 'hi' : 'en';
+        localStorage.setItem('language', currentLanguage);
+        
+        // Update globe icon rotation for visual feedback
+        const globeIcon = document.querySelector('.language-toggle i');
+        globeIcon.style.transform = currentLanguage === 'hi' ? 'rotate(180deg)' : 'rotate(0deg)';
+        globeIcon.style.transition = 'transform 0.3s ease';
+        
+        translatePage();
+        loadHistory();
+      }
+
+      // Dark mode functions
+      function initDarkMode() {
+        const darkMode = localStorage.getItem('darkMode') === 'true';
+        if (darkMode) {
+          document.body.classList.add('dark-mode');
+          updateDarkModeIcons(true);
+        }
+      }
+
+      function toggleDarkMode() {
+        const isDark = document.body.classList.toggle('dark-mode');
+        localStorage.setItem('darkMode', isDark);
+        updateDarkModeIcons(isDark);
+      }
+
+      function updateDarkModeIcons(isDark) {
+        const icon = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        darkModeToggles.forEach(toggle => {
+          toggle.innerHTML = icon;
+        });
+      }
+
+      // Event listeners
+      function setupEventListeners() {
+        // Tab navigation
+        tabs.forEach(tab => {
+          tab.addEventListener('click', () => {
+            const tabName = tab.dataset.tab;
+            switchTab(tabName);
+          });
+        });
+
+        // Analyze button
+        analyzeBtn.addEventListener('click', analyzeIngredients);
+
+        // Scan button
+        scanBtn.addEventListener('click', () => {
+          showPage('scan');
+          stopCamera();
+        });
+
+        // Back buttons
+        Object.entries(backBtns).forEach(([page, btn]) => {
+          btn.addEventListener('click', () => {
+            showPage('analyze');
+            stopCamera();
+          });
+        });
+
+        // File upload
+        fileUpload.addEventListener('change', handleFileUpload);
+
+        // Save analysis
+        saveAnalysisBtn.addEventListener('click', saveAnalysis);
+
+        // Modal close
+        closeModal.addEventListener('click', closeImageModal);
+        
+        window.addEventListener('click', (e) => {
+          if (e.target === imageModal) closeImageModal();
+        });
+
+        // Camera buttons
+        cameraBtn.addEventListener('click', startCamera);
+        captureBtn.addEventListener('click', captureImage);
+
+        // Process image button
+        processImageBtn.addEventListener('click', processImageWithOCR);
+
+        // Dark mode toggles
+        darkModeToggles.forEach(toggle => {
+          toggle.addEventListener('click', toggleDarkMode);
+        });
+
+        // Language toggle
+        languageToggle.addEventListener('click', toggleLanguage);
+      }
+
+      // Navigation functions
+      function switchTab(tabName) {
+        tabs.forEach(tab => {
+          tab.classList.toggle('active', tab.dataset.tab === tabName);
+        });
+        showPage(tabName);
+        if (tabName === 'history') loadHistory();
+      }
+
+      function showPage(pageName) {
+        Object.values(pages).forEach(page => page.classList.remove('active'));
+        if (pages[pageName]) pages[pageName].classList.add('active');
+        window.scrollTo(0, 0);
+      }
+
+      // (Rest of the functions remain exactly the same as in previous code)
+      // (analyzeIngredients(), showResults(), checkCompoundRisks(), etc.)
+      // ...
+ // Analysis functions
+      function analyzeIngredients() {
+        const productName = productNameInput.value.trim() || (currentLanguage === 'en' ? "Unnamed Product" : "अनाम उत्पाद");
+        const ingredients = ingredientsListInput.value
+            .split(/[\n,]/)
+            .map(i => i.trim())
+            .filter(i => i);
+
+        if (ingredients.length === 0) {
+          alert(currentLanguage === 'en' ? "Please enter at least one ingredient" : "कृपया कम से कम एक सामग्री दर्ज करें");
+          return;
+        }
+
+        showResults(productName, ingredients);
+      }
+
+      function showResults(productName, ingredients) {
+        resultsProductName.textContent = productName;
+        ingredientsCount.textContent = `${ingredients.length} ` + 
+          (currentLanguage === 'en' ? 'ingredients analyzed' : 'सामग्रियों का विश्लेषण किया गया');
+        
+        let baseScore = 0;
+        let compoundRiskFactors = 1;
+        const riskCategories = {
+          preservatives: 0,
+          artificial: 0,
+          allergens: 0,
+          additives: 0
+        };
+        
+        ingredientsAnalysis.innerHTML = '';
+
+        ingredients.forEach(ingredient => {
+          const found = Object.entries(ingredientDatabase).find(([name]) => 
+            ingredient.toLowerCase().includes(name.toLowerCase()) ||
+            name.toLowerCase().includes(ingredient.toLowerCase()) ||
+            levenshteinDistance(ingredient.toLowerCase(), name.toLowerCase()) <= 2
+          );
+          
+          const data = found ? ingredientDatabase[found[0]] : { 
+            risk: "medium", 
+            desc: currentLanguage === 'en' ? "No specific safety data available." : "कोई विशिष्ट सुरक्षा डेटा उपलब्ध नहीं है।",
+            icon: "fas fa-question",
+            category: "unknown"
+          };
+
+          // Advanced scoring
+          let ingredientScore = 0;
+          switch(data.risk) {
+            case "high": 
+              ingredientScore = 0.7;
+              compoundRiskFactors *= 2.1 ;
+              break;
+            case "medium": 
+              ingredientScore = 0.2; 
+              compoundRiskFactors *= 1.2;
+              break;
+            case "low": 
+              ingredientScore = 0.05;
+              break;
+          }
+
+          // Category-specific scoring
+          if (data.category) {
+            riskCategories[data.category] += ingredientScore * 1.5;
+          }
+
+          baseScore += ingredientScore;
+
+          // Display ingredient
+          const ingredientEl = document.createElement('div');
+          ingredientEl.className = 'ingredient-item';
+          ingredientEl.style.borderLeftColor = getRiskColor(data.risk);
+          ingredientEl.innerHTML = `
+            <div class="ingredient-header">
+              <i class="${data.icon} ingredient-icon ${data.risk}"></i>
+              <div class="ingredient-name">${ingredient}</div>
+              <div class="ingredient-risk ${data.risk}">${
+                data.risk === 'low' ? (currentLanguage === 'en' ? 'LOW' : 'कम') :
+                data.risk === 'medium' ? (currentLanguage === 'en' ? 'MEDIUM' : 'मध्यम') :
+                (currentLanguage === 'en' ? 'HIGH' : 'उच्च')
+              }</div>
+            </div>
+            <div class="ingredient-desc">${data.desc}</div>
+            ${data.reference ? `<div class="ingredient-reference">${currentLanguage === 'en' ? 'Source:' : 'स्रोत:'} ${data.reference}</div>` : ''}
+          `;
+          ingredientsAnalysis.appendChild(ingredientEl);
+        });
+
+        // Check for compound warnings
+        const compoundWarnings = checkCompoundRisks(ingredients);
+        if (compoundWarnings.length > 0) {
+          compoundWarnings.forEach(warning => {
+            const warningEl = document.createElement('div');
+            warningEl.className = `risk-warning ${warning.severity}`;
+            warningEl.innerHTML = `
+              <i class="${warning.icon}"></i>
+              <strong>${warning.severity === 'high' ? 
+                (currentLanguage === 'en' ? 'Warning:' : 'चेतावनी:') : 
+                (currentLanguage === 'en' ? 'Note:' : 'नोट:')}</strong> 
+              ${currentLanguage === 'en' ? warning.message : translateWarning(warning.message)}
+            `;
+            ingredientsAnalysis.prepend(warningEl);
+          });
+        }
+
+        // Calculate final score
+        let finalScore = Math.min(baseScore * compoundRiskFactors, 3);
+        finalScore += Math.min(
+          (riskCategories.preservatives * 0.7) + 
+          (riskCategories.artificial * 0.9) + 
+          (riskCategories.allergens * 0.5),
+          1.5
+        );
+
+        // Determine risk level
+        let level = "low";
+        if (finalScore >= 2.0 || riskCategories.artificial > 1.2) {
+          level = "high";
+        } else if (finalScore >= 1.2 || riskCategories.preservatives > 0.8) {
+          level = "medium";
+        }
+
+        // Update UI
+        riskLevel.innerHTML = `<i class="${getLevelIcon(level)}"></i> ${
+          level === 'low' ? (currentLanguage === 'en' ? 'Low Risk' : 'कम जोखिम') :
+          level === 'medium' ? (currentLanguage === 'en' ? 'Medium Risk' : 'मध्यम जोखिम') :
+          (currentLanguage === 'en' ? 'High Risk' : 'उच्च जोखिम')
+        }`;
+        riskLevel.className = `risk-badge ${level}`;
+        riskScore.textContent = `${currentLanguage === 'en' ? 'Score:' : 'स्कोर:'} ${finalScore.toFixed(1)}/3.0`;
+        riskIndicator.style.left = `${(finalScore / 3) * 100}%`;
+
+        saveAnalysisBtn.disabled = false;
+        saveAnalysisBtn.innerHTML = `<i class="fas fa-save btn-icon"></i>${
+          currentLanguage === 'en' ? 'Save Analysis' : 'विश्लेषण सहेजें'
+        }`;
+        showPage('results');
+      }
+
+      function translateWarning(message) {
+        const translations = {
+          "Caffeine and Taurine combination may cause cardiovascular stress": "कैफीन और टॉरिन का संयोजन हृदय संबंधी तनाव पैदा कर सकता है",
+          "Multiple preservatives may increase health risks": "एकाधिक परिरक्षक स्वास्थ्य जोखिम बढ़ा सकते हैं",
+          "Multiple artificial sweeteners may affect gut health": "एकाधिक कृत्रिम मिठास आंत के स्वास्थ्य को प्रभावित कर सकती हैं",
+          "MSG with ribonucleotides may intensify flavor-enhancing effects and reactions": "राइबोन्यूक्लियोटाइड्स के साथ एमएसजी स्वाद बढ़ाने वाले प्रभावों और प्रतिक्रियाओं को तेज कर सकता है"
+        };
+        return translations[message] || message;
+      }
+
+      // Check for dangerous ingredient combinations
+      function checkCompoundRisks(ingredients) {
+        const compoundWarnings = [];
+        const lowerCaseIngredients = ingredients.map(i => i.toLowerCase());
+
+        // Caffeine + Taurine
+        if (lowerCaseIngredients.some(i => i.includes('caffeine')) && 
+            lowerCaseIngredients.some(i => i.includes('taurine'))) {
+          compoundWarnings.push({
+            severity: "high",
+            message: "Caffeine and Taurine combination may cause cardiovascular stress",
+            icon: "fas fa-heartbeat"
+          });
+        }
+
+        // Multiple preservatives
+        const preservativeCount = lowerCaseIngredients.filter(i => 
+          ['tbhq', 'sodium benzoate', 'potassium sorbate', 'sodium metabisulfite'].some(p => i.includes(p))
+        ).length;
+        if (preservativeCount > 2) {
+          compoundWarnings.push({
+            severity: "high",
+            message: `Multiple preservatives (${preservativeCount}) may increase health risks`,
+            icon: "fas fa-prescription-bottle-alt"
+          });
+        }
+
+        // Multiple artificial sweeteners
+        const sweetenerCount = lowerCaseIngredients.filter(i => 
+          ['acesulfame k', 'sucralose', 'aspartame'].some(s => i.includes(s))
+        ).length;
+        if (sweetenerCount > 1) {
+          compoundWarnings.push({
+            severity: "medium",
+            message: "Multiple artificial sweeteners may affect gut health",
+            icon: "fas fa-poop"
+          });
+        }
+
+        // MSG combinations
+        if (lowerCaseIngredients.some(i => i.includes('monosodium glutamate') || i.includes('msg'))) {
+          if (lowerCaseIngredients.some(i => i.includes('disodium 5\'-ribonucleotides') || i.includes('635'))) {
+            compoundWarnings.push({
+              severity: "high",
+              message: "MSG with ribonucleotides may intensify flavor-enhancing effects and reactions",
+              icon: "fas fa-head-side-virus"
+            });
+          }
+        }
+
+        return compoundWarnings;
+      }
+
+      // Utility functions
+      function getRiskColor(riskLevel) {
+        const colors = {
+          low: '#8BC34A',
+          medium: '#FF9800',
+          high: '#F44336'
+        };
+        return colors[riskLevel];
+      }
+
+      function getLevelIcon(level) {
+        const icons = {
+          low: 'fas fa-leaf',
+          medium: 'fas fa-exclamation-circle',
+          high: 'fas fa-radiation-alt'
+        };
+        return icons[level];
+      }
+
+      // Levenshtein distance for fuzzy matching
+      function levenshteinDistance(a, b) {
+        if (a.length === 0) return b.length;
+        if (b.length === 0) return a.length;
+
+        const matrix = [];
+        for (let i = 0; i <= b.length; i++) {
+          matrix[i] = [i];
+        }
+        for (let j = 0; j <= a.length; j++) {
+          matrix[0][j] = j;
+        }
+
+        for (let i = 1; i <= b.length; i++) {
+          for (let j = 1; j <= a.length; j++) {
+            const cost = a.charAt(j - 1) === b.charAt(i - 1) ? 0 : 1;
+            matrix[i][j] = Math.min(
+              matrix[i - 1][j] + 1,
+              matrix[i][j - 1] + 1,
+              matrix[i - 1][j - 1] + cost
+            );
+          }
+        }
+
+        return matrix[b.length][a.length];
+      }
+
+      // History functions
+      function saveAnalysis() {
+        const history = JSON.parse(localStorage.getItem('analysisHistory') || '[]');
+        
+        const newAnalysis = {
+          id: Date.now(),
+          productName: resultsProductName.textContent,
+          ingredientCount: ingredientsCount.textContent.split(' ')[0],
+          score: riskScore.textContent.split(' ')[1],
+          level: riskLevel.className.replace('risk-badge ', ''),
+          date: new Date().toLocaleDateString(currentLanguage === 'en' ? 'en-US' : 'hi-IN'),
+          ingredients: Array.from(document.querySelectorAll('.ingredient-item .ingredient-name'))
+            .map(el => el.textContent)
+        };
+
+        history.unshift(newAnalysis);
+        localStorage.setItem('analysisHistory', JSON.stringify(history.slice(0, 50)));
+        alert(currentLanguage === 'en' ? 'Analysis saved to history!' : 'विश्लेषण इतिहास में सहेजा गया!');
+        loadHistory();
+      }
+
+      function loadHistory() {
+        const history = JSON.parse(localStorage.getItem('analysisHistory') || '[]');
+        historyList.innerHTML = '';
+
+        if (history.length === 0) {
+          historyList.innerHTML = `
+            <div class="history-empty">
+              <i class="fas fa-history"></i>
+              <p>${translations[currentLanguage]['noHistory']}</p>
+            </div>
+          `;
+          return;
+        }
+
+        const template = document.getElementById('historyItemTemplate');
+
+        history.forEach(item => {
+          const clone = template.content.cloneNode(true);
+          const historyItem = clone.querySelector('.history-item');
+          const productElement = clone.querySelector('.history-product');
+          const dateElement = clone.querySelector('.history-date');
+          const riskElement = clone.querySelector('.history-risk');
+          const deleteBtn = clone.querySelector('.delete-history-btn');
+
+          productElement.textContent = item.productName;
+          dateElement.textContent = `${item.date} • ${item.ingredientCount} ${
+            currentLanguage === 'en' ? 'ingredients' : 'सामग्री'
+          }`;
+          riskElement.textContent = item.level === 'low' ? (currentLanguage === 'en' ? 'LOW' : 'कम') :
+                                   item.level === 'medium' ? (currentLanguage === 'en' ? 'MEDIUM' : 'मध्यम') :
+                                   (currentLanguage === 'en' ? 'HIGH' : 'उच्च');
+          riskElement.className = `history-risk ${item.level}`;
+          
+          historyItem.addEventListener('click', (e) => {
+            if (!e.target.closest('.delete-history-btn')) {
+              viewHistoricalAnalysis(item);
+            }
+          });
+
+          deleteBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            deleteAnalysis(item.id);
+          });
+
+          historyList.appendChild(clone);
+        });
+      }
+
+      function deleteAnalysis(id) {
+        if (confirm(currentLanguage === 'en' ? 
+          'Are you sure you want to delete this analysis?' : 
+          'क्या आप वाकई इस विश्लेषण को हटाना चाहते हैं?')) {
+          let history = JSON.parse(localStorage.getItem('analysisHistory') || '[]');
+          history = history.filter(item => item.id !== id);
+          localStorage.setItem('analysisHistory', JSON.stringify(history));
+          loadHistory();
+        }
+      }
+
+      function viewHistoricalAnalysis(item) {
+        showResults(item.productName, item.ingredients || []);
+        riskScore.textContent = `${currentLanguage === 'en' ? 'Score:' : 'स्कोर:'} ${item.score}`;
+        const scoreValue = parseFloat(item.score.split('/')[0]);
+        riskIndicator.style.left = `${(scoreValue / 3) * 100}%`;
+        saveAnalysisBtn.disabled = true;
+        saveAnalysisBtn.innerHTML = `<i class="fas fa-save btn-icon"></i>${
+          currentLanguage === 'en' ? 'Previously Saved' : 'पहले से सहेजा गया'
+        }`;
+      }
+
+      // Camera and OCR functions
+      function handleFileUpload(e) {
+        if (e.target.files.length > 0) {
+          const file = e.target.files[0];
+          const reader = new FileReader();
+          
+          reader.onload = (event) => {
+            modalMediaContainer.innerHTML = `
+              <img src="${event.target.result}" alt="Uploaded Image">
+            `;
+            imageModal.classList.add('active');
+          };
+          
+          reader.readAsDataURL(file);
+        }
+      }
+
+      async function startCamera() {
+        try {
+          cameraStream = await navigator.mediaDevices.getUserMedia({ 
+            video: { facingMode: 'environment' },
+            audio: false 
+          });
+          cameraPreview.srcObject = cameraStream;
+          cameraPreview.style.display = 'block';
+          cameraBtn.style.display = 'none';
+          captureBtn.style.display = 'block';
+        } catch (err) {
+          console.error("Camera error:", err);
+          alert(currentLanguage === 'en' ? 
+            "Could not access the camera. Please check permissions." : 
+            "कैमरा तक पहुंच नहीं बन सकी। कृपया अनुमतियाँ जांचें।");
+        }
+      }
+
+      function stopCamera() {
+        if (cameraStream) {
+          cameraStream.getTracks().forEach(track => track.stop());
+          cameraStream = null;
+        }
+        cameraPreview.style.display = 'none';
+        cameraBtn.style.display = 'block';
+        captureBtn.style.display = 'none';
+      }
+
+      function captureImage() {
+        const canvas = document.createElement('canvas');
+        canvas.width = cameraPreview.videoWidth;
+        canvas.height = cameraPreview.videoHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(cameraPreview, 0, 0, canvas.width, canvas.height);
+        
+        modalMediaContainer.innerHTML = `
+          <img src="${canvas.toDataURL('image/jpeg')}" alt="Captured Image">
+        `;
+        
+        imageModal.classList.add('active');
+        stopCamera();
+      }
+
+      async function processImageWithOCR() {
+        const image = modalMediaContainer.querySelector('img');
+        if (!image) return;
+
+        ocrProgress.textContent = currentLanguage === 'en' ? "Initializing OCR..." : "OCR आरंभ किया जा रहा है...";
+        processImageBtn.disabled = true;
+        
+        try {
+          if (!worker) {
+            worker = await Tesseract.createWorker({
+              logger: m => {
+                if (m.status === 'recognizing text') {
+                  ocrProgress.textContent = currentLanguage === 'en' ? 
+                    `Processing: ${Math.round(m.progress * 100)}%` : 
+                    `प्रसंस्करण: ${Math.round(m.progress * 100)}%`;
+                }
+              }
+            });
+            await worker.loadLanguage(currentLanguage === 'en' ? 'eng' : 'hin+eng');
+            await worker.initialize(currentLanguage === 'en' ? 'eng' : 'hin+eng');
+            await worker.setParameters({
+              tessedit_pageseg_mode: '6',
+              preserve_interword_spaces: '1',
+              tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789(),.-% ',
+              user_defined_dpi: '300'
+            });
+          }
+
+          ocrProgress.textContent = currentLanguage === 'en' ? "Processing image..." : "छवि प्रसंस्करण...";
+          
+          const { data: { text } } = await worker.recognize(image);
+          
+          // Advanced ingredient list parsing
+          let cleanedText = text
+            .replace(/(nutrition facts|serving size|daily value|ingredients?[:]?|contains?[:]?|may contain|product of|packaged? in|distributed? by|manufactured? for)/gi, '')
+            .replace(/(\d+%|\d+\.\d+%|\d+\s?g|\d+\s?mg|\d+\s?mcg|\d+\s?oz|\d+\s?ml|\d+\s?kcal|\d+\s?kJ)\b/gi, '')
+            .replace(/[•*_\-–—]/g, ',')
+            .replace(/\b([A-Z])([A-Z]+)\b/g, (match, p1, p2) => p1 + p2.toLowerCase())
+            .replace(/\b(\w+)\s+\1\b/gi, '$1')
+            .replace(/([a-z])([A-Z])/g, '$1 $2')
+            .replace(/\s{2,}/g, ' ')
+            .replace(/,\s*,/g, ',')
+            .trim();
+
+          // Smart comma and newline handling
+          const lines = cleanedText.split('\n')
+            .map(line => line.trim())
+            .filter(line => line.length > 2 && !/^\d/.test(line));
+
+          // Further processing
+          const finalIngredients = [];
+          lines.forEach(line => {
+            const items = line.split(/(?<!\([^)]*),(?![^(]*\))/g);
+            items.forEach(item => {
+              item = item.trim()
+                .replace(/^[.,]+|[.,]+$/g, '')
+                .replace(/\s*\([^)]*\)/g, '');
+              
+              if (item.length > 2 && !/^and$|^or$/i.test(item)) {
+                finalIngredients.push(item);
+              }
+            });
+          });
+
+          ingredientsListInput.value = finalIngredients.join('\n');
+          closeImageModal();
+          
+          const productName = productNameInput.value.trim() || 
+            (currentLanguage === 'en' ? "Scanned Product" : "स्कैन किया गया उत्पाद");
+          showResults(productName, finalIngredients);
+          
+        } catch (error) {
+          console.error("OCR Error:", error);
+          ocrProgress.textContent = currentLanguage === 'en' ? 
+            "Error processing image. Please try again." : 
+            "छवि प्रसंस्करण में त्रुटि। कृपया पुनः प्रयास करें।";
+        } finally {
+          processImageBtn.disabled = false;
+        }
+      }
+
+      function closeImageModal() {
+        if (worker) {
+          worker.terminate();
+          worker = null;
+        }
+        modalMediaContainer.innerHTML = '';
+        imageModal.classList.remove('active');
+        ocrProgress.textContent = translations[currentLanguage]['ocrReady'];
+      }
+      // Initialize the app
+      init();
+    });
+  </script>
+</body>
+</html>
+<!-- partial -->
+  
+</body>
+</html>
